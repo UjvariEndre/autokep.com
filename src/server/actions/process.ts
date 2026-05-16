@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { downloadObject, uploadBuffer } from "@/lib/r2";
 import { removeCarBackground } from "@/lib/removebg";
-import { compositeOnShowroom } from "@/lib/composite";
+import { composeOnBackground } from "@/lib/composite";
 import { getOrCreateUser } from "@/server/users";
 
 function projectNameFromFilename(filename: string): string {
@@ -53,7 +53,7 @@ export async function processImage(
     // On the free tier this degrades to preview (max 0.25 MP / ~500x500).
     // Switch to "full" once we have paid HD credits — see CLAUDE.md "Known issues".
     const cutout = await removeCarBackground(inputBuf, { size: "auto" });
-    const composed = await compositeOnShowroom(cutout);
+    const composed = await composeOnBackground(cutout, "SHOWROOM");
     const processedKey = `processed/${user.id}/${image.id}.jpg`;
     await uploadBuffer(processedKey, composed, "image/jpeg");
 

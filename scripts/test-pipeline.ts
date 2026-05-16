@@ -5,7 +5,7 @@ import { config as loadEnv } from "dotenv";
 loadEnv({ path: ".env.local" });
 
 import { removeCarBackground } from "../src/lib/removebg";
-import { compositeOnShowroom } from "../src/lib/composite";
+import { composeOnBackground } from "../src/lib/composite";
 
 const INPUT = resolve("test-fixtures/sample-car.jpg");
 const CUTOUT = resolve("test-fixtures/sample-car-cutout.png");
@@ -29,9 +29,9 @@ async function main() {
   const cutoutStat = await stat(CUTOUT);
   console.log(`          ${CUTOUT} (${cutoutStat.size} B) in ${dtCutout} ms`);
 
-  console.log("[compose] compositeOnShowroom (shr01 cover-fit) ...");
+  console.log("[compose] composeOnBackground(SHOWROOM) — alpha bbox anchor ...");
   const t1 = Date.now();
-  const final = await compositeOnShowroom(cutout);
+  const final = await composeOnBackground(cutout, "SHOWROOM");
   const dtCompose = Date.now() - t1;
   await writeFile(FINAL, final);
   const finalStat = await stat(FINAL);
