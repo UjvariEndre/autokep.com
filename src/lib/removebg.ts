@@ -53,8 +53,11 @@ function classifyStatus(status: number): {
   }
 }
 
+export type RemoveBgSize = "preview" | "full" | "auto";
+
 export async function removeCarBackground(
   imageBuffer: Buffer,
+  options?: { size?: RemoveBgSize },
 ): Promise<Buffer> {
   const apiKey = process.env.REMOVEBG_API_KEY;
   if (!apiKey) {
@@ -69,6 +72,7 @@ export async function removeCarBackground(
   form.append("type", "car");
   form.append("format", "png");
   form.append("bg_color", "");
+  if (options?.size) form.append("size", options.size);
 
   const response = await fetch(REMOVEBG_URL, {
     method: "POST",
