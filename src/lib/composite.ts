@@ -25,10 +25,10 @@ const PRESETS: Partial<Record<BackgroundType, Preset>> = {
   },
 };
 
-// Pixels with alpha above this are treated as solid car body; lower values are
-// the drop shadow from remove.bg's add_shadow=true. Excluding the shadow from
-// the bbox keeps the wheels anchored at floorY (not the shadow's bottom).
+// alpha > SOLID = car body (used for anchoring the wheels at floorY)
+// alpha > 0     = car body + drop shadow (used to extract the full visible region)
 const SOLID_ALPHA_THRESHOLD = 200;
+const VISIBLE_ALPHA_THRESHOLD = 0;
 
 const bgCache = new Map<string, Buffer>();
 async function loadBackground(file: string): Promise<Buffer> {
@@ -41,32 +41,43 @@ async function loadBackground(file: string): Promise<Buffer> {
 
 type Bbox = { x: number; y: number; w: number; h: number };
 
-async function detectCarBbox(buf: Buffer): Promise<Bbox> {
+async function detectBboxes(
+  buf: Buffer,
+): Promise<{ solid: Bbox; visible: Bbox }> {
   const { data, info } = await sharp(buf)
     .ensureAlpha()
     .raw()
     .toBuffer({ resolveWithObject: true });
   const { width, height, channels } = info;
-  let minX = width;
-  let minY = height;
-  let maxX = -1;
-  let maxY = -1;
+
+  let sMinX = width, sMinY = height, sMaxX = -1, sMaxY = -1;
+  let vMinX = width, vMinY = height, vMaxX = -1, vMaxY = -1;
+
   for (let y = 0; y < height; y++) {
     const rowBase = y * width * channels;
     for (let x = 0; x < width; x++) {
       const alpha = data[rowBase + x * channels + (channels - 1)];
-      if (alpha > SOLID_ALPHA_THRESHOLD) {
-        if (x < minX) minX = x;
-        if (x > maxX) maxX = x;
-        if (y < minY) minY = y;
-        if (y > maxY) maxY = y;
+      if (alpha > VISIBLE_ALPHA_THRESHOLD) {
+        if (x < vMinX) vMinX = x;
+        if (x > vMaxX) vMaxX = x;
+        if (y < vMinY) vMinY = y;
+        if (y > vMaxY) vMaxY = y;
+        if (alpha > SOLID_ALPHA_THRESHOLD) {
+          if (x < sMinX) sMinX = x;
+          if (x > sMaxX) sMaxX = x;
+          if (y < sMinY) sMinY = y;
+          if (y > sMaxY) sMaxY = y;
+        }
       }
     }
   }
-  if (maxX < 0) {
+  if (sMaxX < 0) {
     throw new Error("Üres cutout — nincs car alpha a PNG-ben.");
   }
-  return { x: minX, y: minY, w: maxX - minX + 1, h: maxY - minY + 1 };
+  return {
+    solid: { x: sMinX, y: sMinY, w: sMaxX - sMinX + 1, h: sMaxY - sMinY + 1 },
+    visible: { x: vMinX, y: vMinY, w: vMaxX - vMinX + 1, h: vMaxY - vMinY + 1 },
+  };
 }
 
 export async function composeOnBackground(
@@ -105,25 +116,51 @@ export async function composeOnBackground(
     .removeAlpha()
     .toBuffer();
 
-  // 2. Detect car body bbox (excluding shadow) and compute scale factor so the
-  // body occupies cfg.carWidthScale of the canvas width.
-  const bbox = await detectCarBbox(transparentPng);
-  const scale = (canvasW * cfg.carWidthScale) / bbox.w;
-  const scaledCutoutW = Math.max(1, Math.round(canvasW * scale));
-  const scaledCutoutH = Math.max(1, Math.round(canvasH * scale));
-  const scaledCutout = await sharp(transparentPng)
-    .resize({ width: scaledCutoutW, height: scaledCutoutH })
+  // 2. Detect bboxes and extract just the visible region (car + shadow).
+  // Extracting drops any transparent padding around the car so the scale we
+  // apply next is based on visual content, not original PNG dimensions.
+  const { solid, visible } = await detectBboxes(transparentPng);
+  const carExtract = await sharp(transparentPng)
+    .extract({
+      left: visible.x,
+      top: visible.y,
+      width: visible.w,
+      height: visible.h,
+    })
     .toBuffer();
 
-  // 3. Anchor: bbox center horizontally at canvas center, bbox bottom at floorY.
-  // Math runs on the un-rounded scale so left/top sub-pixel drift stays tiny.
-  const scaledBboxCenterX = (bbox.x + bbox.w / 2) * scale;
-  const scaledBboxBottomY = (bbox.y + bbox.h) * scale;
-  const insertLeft = Math.round(canvasW / 2 - scaledBboxCenterX);
-  const insertTop = Math.round(canvasH * cfg.floorY - scaledBboxBottomY);
+  // 3. Compute scale so the solid body fills cfg.carWidthScale of the canvas,
+  // then clamp it so the extracted region still fits inside the canvas. If
+  // the photo is very loosely cropped (or the car aspect is very different
+  // from the canvas), this gracefully shrinks the car instead of crashing.
+  const desiredScale = (canvasW * cfg.carWidthScale) / solid.w;
+  const maxScale = Math.min(canvasW / visible.w, canvasH / visible.h);
+  const scale = Math.min(desiredScale, maxScale);
+
+  const scaledExtractW = Math.max(1, Math.round(visible.w * scale));
+  const scaledExtractH = Math.max(1, Math.round(visible.h * scale));
+  const scaledCar = await sharp(carExtract)
+    .resize({ width: scaledExtractW, height: scaledExtractH })
+    .toBuffer();
+
+  // 4. Anchor: solid bbox center horizontally at canvas center, solid bbox
+  // bottom (wheels line) at floorY. Coordinates are relative to the extracted
+  // image, so we subtract the extract's origin first.
+  const solidInExtractCenterX = solid.x - visible.x + solid.w / 2;
+  const solidInExtractBottomY = solid.y - visible.y + solid.h;
+  const scaledSolidCenterX = solidInExtractCenterX * scale;
+  const scaledSolidBottomY = solidInExtractBottomY * scale;
+
+  // Clamp offsets to keep the extract inside the canvas. Asymmetric shadows
+  // can push the math off-center; clamping keeps Sharp happy at the cost of
+  // a few pixels of off-center placement in those edge cases.
+  const rawLeft = canvasW / 2 - scaledSolidCenterX;
+  const rawTop = canvasH * cfg.floorY - scaledSolidBottomY;
+  const insertLeft = Math.max(0, Math.min(canvasW - scaledExtractW, Math.round(rawLeft)));
+  const insertTop = Math.max(0, Math.min(canvasH - scaledExtractH, Math.round(rawTop)));
 
   return sharp(backgroundCanvas)
-    .composite([{ input: scaledCutout, left: insertLeft, top: insertTop }])
+    .composite([{ input: scaledCar, left: insertLeft, top: insertTop }])
     .jpeg({ quality: 90, mozjpeg: true })
     .toBuffer();
 }
