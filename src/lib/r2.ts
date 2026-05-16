@@ -88,3 +88,20 @@ export async function deleteObject(key: string): Promise<void> {
     }),
   );
 }
+
+export async function downloadObject(key: string): Promise<Buffer> {
+  const { client, bucket } = getR2();
+  const response = await client.send(
+    new GetObjectCommand({ Bucket: bucket, Key: key }),
+  );
+  const body = response.Body;
+  if (!body) {
+    throw new Error(`R2 object üres: ${key}`);
+  }
+  const stream = body as unknown as AsyncIterable<Uint8Array>;
+  const chunks: Buffer[] = [];
+  for await (const chunk of stream) {
+    chunks.push(Buffer.from(chunk));
+  }
+  return Buffer.concat(chunks);
+}
