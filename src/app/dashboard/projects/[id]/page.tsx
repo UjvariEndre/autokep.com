@@ -34,6 +34,14 @@ export default async function ProjectPage({
     image?.processedKey != null
       ? await getPresignedDownloadUrl(image.processedKey, 3600)
       : null;
+  const downloadUrl =
+    image?.processedKey != null
+      ? await getPresignedDownloadUrl(
+          image.processedKey,
+          3600,
+          `${project.name}.jpg`,
+        )
+      : null;
   const cutoutUrl =
     image?.cutoutKey != null
       ? await getPresignedDownloadUrl(image.cutoutKey, 3600)
@@ -67,6 +75,7 @@ export default async function ProjectPage({
             initialOffsetY={image.offsetYPct}
             originalUrl={originalUrl}
             processedUrl={processedUrl}
+            downloadUrl={downloadUrl}
             cutoutUrl={cutoutUrl}
             projectName={project.name}
           />

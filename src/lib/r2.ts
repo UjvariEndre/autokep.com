@@ -54,11 +54,19 @@ export async function getPresignedUploadUrl(
 export async function getPresignedDownloadUrl(
   key: string,
   expiresInSec = 3600,
+  downloadFilename?: string,
 ): Promise<string> {
   const { client, bucket } = getR2();
+  // If downloadFilename is set, embed Content-Disposition: attachment in the
+  // signed URL so the browser downloads instead of rendering. RFC 5987 form
+  // (filename*=UTF-8''...) keeps Hungarian characters working safely.
+  const responseContentDisposition = downloadFilename
+    ? `attachment; filename*=UTF-8''${encodeURIComponent(downloadFilename)}`
+    : undefined;
   const command = new GetObjectCommand({
     Bucket: bucket,
     Key: key,
+    ResponseContentDisposition: responseContentDisposition,
   });
   return getSignedUrl(client, command, { expiresIn: expiresInSec });
 }

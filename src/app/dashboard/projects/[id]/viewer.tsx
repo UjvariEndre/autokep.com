@@ -18,6 +18,7 @@ type Props = {
   initialOffsetY: number;
   originalUrl: string | null;
   processedUrl: string | null;
+  downloadUrl: string | null;
   cutoutUrl: string | null;
   projectName: string;
 };
@@ -146,6 +147,7 @@ export function ProjectViewer(props: Props) {
     initialOffsetY,
     originalUrl,
     processedUrl,
+    downloadUrl,
     cutoutUrl,
     projectName,
   } = props;
@@ -350,10 +352,8 @@ export function ProjectViewer(props: Props) {
             </div>
             <div className="flex items-center gap-3">
               <a
-                href={processedUrl}
+                href={downloadUrl ?? processedUrl}
                 download={`${projectName}.jpg`}
-                target="_blank"
-                rel="noopener noreferrer"
                 className={cn(buttonVariants())}
               >
                 Letöltés
