@@ -80,16 +80,36 @@ async function detectBboxes(
   };
 }
 
+export type ComposeOpts = {
+  rotateDeg?: number;
+  offsetXPct?: number; // -50..50, percent of canvas width
+  offsetYPct?: number; // -50..50, percent of canvas height
+};
+
 export async function composeOnBackground(
   transparentPng: Buffer,
   preset: BackgroundType,
+  opts: ComposeOpts = {},
 ): Promise<Buffer> {
   const cfg = PRESETS[preset];
   if (!cfg) {
     throw new Error(`Nincs preset konfigurálva ehhez: ${preset}`);
   }
 
-  const meta = await sharp(transparentPng).metadata();
+  const rotateDeg = opts.rotateDeg ?? 0;
+  const offsetXPct = opts.offsetXPct ?? 0;
+  const offsetYPct = opts.offsetYPct ?? 0;
+
+  // Rotation: positive = clockwise, applied before bbox/scale/compose. All
+  // downstream sizing operates on the rotated buffer's coordinate space.
+  let working = transparentPng;
+  if (Math.abs(rotateDeg) > 0.05) {
+    working = await sharp(transparentPng)
+      .rotate(rotateDeg, { background: { r: 0, g: 0, b: 0, alpha: 0 } })
+      .toBuffer();
+  }
+
+  const meta = await sharp(working).metadata();
   const canvasW = meta.width;
   const canvasH = meta.height;
   if (!canvasW || !canvasH) {
@@ -119,8 +139,8 @@ export async function composeOnBackground(
   // 2. Detect bboxes and extract just the visible region (car + shadow).
   // Extracting drops any transparent padding around the car so the scale we
   // apply next is based on visual content, not original PNG dimensions.
-  const { solid, visible } = await detectBboxes(transparentPng);
-  const carExtract = await sharp(transparentPng)
+  const { solid, visible } = await detectBboxes(working);
+  const carExtract = await sharp(working)
     .extract({
       left: visible.x,
       top: visible.y,
@@ -151,11 +171,16 @@ export async function composeOnBackground(
   const scaledSolidCenterX = solidInExtractCenterX * scale;
   const scaledSolidBottomY = solidInExtractBottomY * scale;
 
+  // User offsets shift the car from the default anchor; expressed as percent
+  // of canvas dimensions so they remain meaningful across different inputs.
+  const offsetPxX = (offsetXPct / 100) * canvasW;
+  const offsetPxY = (offsetYPct / 100) * canvasH;
+
   // Clamp offsets to keep the extract inside the canvas. Asymmetric shadows
   // can push the math off-center; clamping keeps Sharp happy at the cost of
   // a few pixels of off-center placement in those edge cases.
-  const rawLeft = canvasW / 2 - scaledSolidCenterX;
-  const rawTop = canvasH * cfg.floorY - scaledSolidBottomY;
+  const rawLeft = canvasW / 2 - scaledSolidCenterX + offsetPxX;
+  const rawTop = canvasH * cfg.floorY - scaledSolidBottomY + offsetPxY;
   const insertLeft = Math.max(0, Math.min(canvasW - scaledExtractW, Math.round(rawLeft)));
   const insertTop = Math.max(0, Math.min(canvasH - scaledExtractH, Math.round(rawTop)));
 

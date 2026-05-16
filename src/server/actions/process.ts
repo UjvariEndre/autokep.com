@@ -53,6 +53,11 @@ export async function processImage(
     // On the free tier this degrades to preview (max 0.25 MP / ~500x500).
     // Switch to "full" once we have paid HD credits — see CLAUDE.md "Known issues".
     const cutout = await removeCarBackground(inputBuf, { size: "auto" });
+
+    // Persist the cutout so future edits don't need to re-call remove.bg.
+    const cutoutKey = `cutouts/${user.id}/${image.id}.png`;
+    await uploadBuffer(cutoutKey, cutout, "image/png");
+
     const composed = await composeOnBackground(cutout, "SHOWROOM");
     const processedKey = `processed/${user.id}/${image.id}.jpg`;
     await uploadBuffer(processedKey, composed, "image/jpeg");
@@ -60,13 +65,13 @@ export async function processImage(
     if (unlimited) {
       await prisma.image.update({
         where: { id: image.id },
-        data: { status: "DONE", processedKey },
+        data: { status: "DONE", processedKey, cutoutKey },
       });
     } else {
       await prisma.$transaction([
         prisma.image.update({
           where: { id: image.id },
-          data: { status: "DONE", processedKey },
+          data: { status: "DONE", processedKey, cutoutKey },
         }),
         prisma.user.update({
           where: { id: user.id },

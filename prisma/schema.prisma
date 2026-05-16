@@ -41,7 +41,11 @@ model Image {
   projectId    String
   project      Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
   originalKey  String
+  cutoutKey    String?
   processedKey String?
+  rotateDeg    Float         @default(0)
+  offsetXPct   Float         @default(0)
+  offsetYPct   Float         @default(0)
   status       ProcessStatus @default(PENDING)
   errorMessage String?
   createdAt    DateTime      @default(now())
