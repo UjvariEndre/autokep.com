@@ -24,3 +24,8 @@ Web app: autókereskedők feltöltik az autós fotóikat, mi automatikusan kicse
   - `prisma/` — schema és migrations
 - Env változók `.env.local`-ban (commitolva soha)
 - Magyar UI nyelv, Clerk `huHU` locale
+
+## Known issues
+
+- **remove.bg HD kreditek hiányoznak.** A `processImage` action `size: "auto"`-val hívja a remove.bg-t, mert a `size: "full"` 402 (insufficient_credits) hibát ad — a kulcsunkon nincs paid HD credit, csak a free tier preview keret. `auto` ezért preview felbontáson tér vissza (max 0.25 MP, ~500×500). Ha HD output kell, először vegyél HD krediteket a remove.bg-n, utána `process.ts`-ben átállítani `size: "full"`-re.
+- **`UNLIMITED_CREDIT_EMAILS`** env változó dev/test bypass: a listán szereplő User-eknek a `processImage` se nem ellenőriz, se nem dekrementál `creditsLeft`-et. Production-ben üresen kell hagyni.

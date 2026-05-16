@@ -12,12 +12,22 @@ function projectNameFromFilename(filename: string): string {
   return (noExt || "Projekt").slice(0, 80);
 }
 
+function hasUnlimitedCredits(email: string): boolean {
+  const raw = process.env.UNLIMITED_CREDIT_EMAILS ?? "";
+  const list = raw
+    .split(",")
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean);
+  return list.includes(email.toLowerCase());
+}
+
 export async function processImage(
   originalKey: string,
   originalFilename: string,
 ): Promise<{ projectId: string }> {
   const user = await getOrCreateUser();
-  if (user.creditsLeft <= 0) {
+  const unlimited = hasUnlimitedCredits(user.email);
+  if (!unlimited && user.creditsLeft <= 0) {
     throw new Error("Elfogytak a krediteid.");
   }
 
@@ -39,21 +49,31 @@ export async function processImage(
 
   try {
     const inputBuf = await downloadObject(originalKey);
-    const cutout = await removeCarBackground(inputBuf, { size: "full" });
+    // size=auto: remove.bg returns the best resolution the account can pay for.
+    // On the free tier this degrades to preview (max 0.25 MP / ~500x500).
+    // Switch to "full" once we have paid HD credits — see CLAUDE.md "Known issues".
+    const cutout = await removeCarBackground(inputBuf, { size: "auto" });
     const composed = await compositeOnShowroom(cutout);
     const processedKey = `processed/${user.id}/${image.id}.jpg`;
     await uploadBuffer(processedKey, composed, "image/jpeg");
 
-    await prisma.$transaction([
-      prisma.image.update({
+    if (unlimited) {
+      await prisma.image.update({
         where: { id: image.id },
         data: { status: "DONE", processedKey },
-      }),
-      prisma.user.update({
-        where: { id: user.id },
-        data: { creditsLeft: { decrement: 1 } },
-      }),
-    ]);
+      });
+    } else {
+      await prisma.$transaction([
+        prisma.image.update({
+          where: { id: image.id },
+          data: { status: "DONE", processedKey },
+        }),
+        prisma.user.update({
+          where: { id: user.id },
+          data: { creditsLeft: { decrement: 1 } },
+        }),
+      ]);
+    }
 
     return { projectId: project.id };
   } catch (err) {
