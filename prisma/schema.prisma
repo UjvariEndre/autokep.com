@@ -1,8 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Get a free hosted Postgres database in seconds: `npx create-db`
-
 generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
@@ -10,4 +8,65 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+model User {
+  id           String    @id @default(cuid())
+  clerkId      String    @unique
+  email        String    @unique
+  plan         Plan      @default(FREE)
+  creditsLeft  Int       @default(3)
+  creditsReset DateTime  @default(now())
+  projects     Project[]
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+}
+
+model Project {
+  id             String         @id @default(cuid())
+  userId         String
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name           String
+  backgroundType BackgroundType
+  backgroundUrl  String?
+  images         Image[]
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  @@index([userId])
+}
+
+model Image {
+  id           String        @id @default(cuid())
+  projectId    String
+  project      Project       @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  originalKey  String
+  processedKey String?
+  status       ProcessStatus @default(PENDING)
+  errorMessage String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@index([projectId])
+  @@index([status])
+}
+
+enum Plan {
+  FREE
+  PRO
+  BUSINESS
+}
+
+enum BackgroundType {
+  STUDIO_GREY
+  SHOWROOM
+  OUTDOOR_ASPHALT
+  CUSTOM
+}
+
+enum ProcessStatus {
+  PENDING
+  PROCESSING
+  DONE
+  FAILED
 }
