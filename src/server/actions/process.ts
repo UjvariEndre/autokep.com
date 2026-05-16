@@ -3,7 +3,7 @@
 import { prisma } from "@/lib/prisma";
 import { downloadObject, uploadBuffer } from "@/lib/r2";
 import { removeCarBackground } from "@/lib/removebg";
-import { compositeOnStudioGrey } from "@/lib/composite";
+import { compositeOnShowroom } from "@/lib/composite";
 import { getOrCreateUser } from "@/server/users";
 
 function projectNameFromFilename(filename: string): string {
@@ -25,7 +25,7 @@ export async function processImage(
     data: {
       userId: user.id,
       name: projectNameFromFilename(originalFilename),
-      backgroundType: "STUDIO_GREY",
+      backgroundType: "SHOWROOM",
     },
   });
 
@@ -40,7 +40,7 @@ export async function processImage(
   try {
     const inputBuf = await downloadObject(originalKey);
     const cutout = await removeCarBackground(inputBuf, { size: "full" });
-    const composed = await compositeOnStudioGrey(cutout);
+    const composed = await compositeOnShowroom(cutout);
     const processedKey = `processed/${user.id}/${image.id}.jpg`;
     await uploadBuffer(processedKey, composed, "image/jpeg");
 

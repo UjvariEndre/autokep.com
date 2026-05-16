@@ -57,12 +57,16 @@ export type RemoveBgSize = "preview" | "full" | "auto";
 
 export async function removeCarBackground(
   imageBuffer: Buffer,
-  options?: { size?: RemoveBgSize },
+  options?: { size?: RemoveBgSize; addShadow?: boolean },
 ): Promise<Buffer> {
   const apiKey = process.env.REMOVEBG_API_KEY;
   if (!apiKey) {
     throw new Error("REMOVEBG_API_KEY env változó hiányzik.");
   }
+
+  // add_shadow defaults to true: render the car with an artificial drop shadow
+  // baked into the cutout's alpha so it survives compositing onto any background.
+  const addShadow = options?.addShadow ?? true;
 
   const form = new FormData();
   const blob = new Blob([new Uint8Array(imageBuffer)], {
@@ -72,6 +76,7 @@ export async function removeCarBackground(
   form.append("type", "car");
   form.append("format", "png");
   form.append("bg_color", "");
+  form.append("add_shadow", addShadow ? "true" : "false");
   if (options?.size) form.append("size", options.size);
 
   const response = await fetch(REMOVEBG_URL, {
