@@ -64,6 +64,9 @@ export default async function ProjectPage({
 
       {image ? (
         <ProjectViewer
+          projectId={project.id}
+          projectName={project.name}
+          projectCreatedAt={project.createdAt.toISOString()}
           imageId={image.id}
           status={image.status}
           errorMessage={image.errorMessage}
@@ -74,7 +77,6 @@ export default async function ProjectPage({
           processedUrl={processedUrl}
           downloadUrl={downloadUrl}
           cutoutUrl={cutoutUrl}
-          projectName={project.name}
         />
       ) : (
         <div className="rounded-3xl border border-border/70 bg-white p-8 text-muted-foreground shadow-soft">

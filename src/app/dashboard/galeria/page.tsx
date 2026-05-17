@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
 import { hu } from "date-fns/locale";
-import { ImageIcon, Plus, Sparkles } from "lucide-react";
+import { ImageIcon, Plus, Sparkles, Trash2 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { getPresignedDownloadUrl } from "@/lib/r2";
 import { getOrCreateUser } from "@/server/users";
 import { buttonVariants } from "@/components/ui/button";
+import { DeleteProjectDialog } from "@/components/delete-project-dialog";
 import { cn } from "@/lib/utils";
 import type { ProcessStatus } from "@/generated/prisma/enums";
 
@@ -101,12 +102,14 @@ export default async function GalleryPage() {
       ) : (
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {cards.map(({ project, status, thumbUrl }) => (
-            <Link
+            <article
               key={project.id}
-              href={`/dashboard/projects/${project.id}`}
-              className="group block focus:outline-none"
+              className="group relative overflow-hidden rounded-2xl border border-border/70 bg-white shadow-soft transition-all duration-200 hover:-translate-y-1 hover:shadow-soft-lg focus-within:-translate-y-1 focus-within:shadow-soft-lg"
             >
-              <article className="overflow-hidden rounded-2xl border border-border/70 bg-white shadow-soft transition-all duration-200 group-hover:-translate-y-1 group-hover:shadow-soft-lg group-focus:-translate-y-1 group-focus:shadow-soft-lg">
+              <Link
+                href={`/dashboard/projects/${project.id}`}
+                className="block focus:outline-none"
+              >
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-gradient-to-br from-secondary to-accent/40">
                   {thumbUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
@@ -133,7 +136,7 @@ export default async function GalleryPage() {
                     {STATUS_LABEL[status]}
                   </span>
                 </div>
-                <div className="px-5 py-4">
+                <div className="px-5 py-4 pr-14">
                   <h3 className="truncate text-sm font-semibold tracking-tight text-foreground">
                     {project.name}
                   </h3>
@@ -144,8 +147,23 @@ export default async function GalleryPage() {
                     })}
                   </p>
                 </div>
-              </article>
-            </Link>
+              </Link>
+
+              <DeleteProjectDialog
+                projectId={project.id}
+                projectName={project.name}
+                createdAt={project.createdAt}
+                trigger={
+                  <button
+                    type="button"
+                    aria-label="Kép törlése"
+                    className="absolute bottom-3 right-3 z-10 inline-flex size-9 items-center justify-center rounded-full border border-border/70 bg-white/90 text-muted-foreground shadow-soft backdrop-blur transition-colors hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300"
+                  >
+                    <Trash2 className="size-4" />
+                  </button>
+                }
+              />
+            </article>
           ))}
         </div>
       )}

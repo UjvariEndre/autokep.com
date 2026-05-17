@@ -3,14 +3,18 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Download, Loader2, Pencil, RotateCcw } from "lucide-react";
+import { Download, Loader2, Pencil, RotateCcw, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { buttonVariants } from "@/components/ui/button";
+import { DeleteProjectDialog } from "@/components/delete-project-dialog";
 import { cn } from "@/lib/utils";
 import { editImage } from "@/server/actions/edit";
 import type { ProcessStatus } from "@/generated/prisma/enums";
 
 type Props = {
+  projectId: string;
+  projectName: string;
+  projectCreatedAt: string;
   imageId: string;
   status: ProcessStatus;
   errorMessage: string | null;
@@ -21,7 +25,6 @@ type Props = {
   processedUrl: string | null;
   downloadUrl: string | null;
   cutoutUrl: string | null;
-  projectName: string;
 };
 
 const SHOWROOM_URL = "/images/shr02.png";
@@ -140,6 +143,9 @@ function compose(
 
 export function ProjectViewer(props: Props) {
   const {
+    projectId,
+    projectName,
+    projectCreatedAt,
     imageId,
     status,
     errorMessage,
@@ -150,7 +156,6 @@ export function ProjectViewer(props: Props) {
     processedUrl,
     downloadUrl,
     cutoutUrl,
-    projectName,
   } = props;
 
   const router = useRouter();
@@ -385,6 +390,24 @@ export function ProjectViewer(props: Props) {
                   Szerkesztés
                 </button>
               )}
+              <DeleteProjectDialog
+                projectId={projectId}
+                projectName={projectName}
+                createdAt={projectCreatedAt}
+                onDeleted={() => router.push("/dashboard/galeria")}
+                trigger={
+                  <button
+                    type="button"
+                    className={cn(
+                      buttonVariants({ variant: "outline" }),
+                      "text-rose-600 hover:border-rose-200 hover:bg-rose-50 hover:text-rose-700",
+                    )}
+                  >
+                    <Trash2 className="size-4" />
+                    Törlés
+                  </button>
+                }
+              />
             </div>
           </div>
         ) : status === "PROCESSING" || status === "PENDING" ? (
