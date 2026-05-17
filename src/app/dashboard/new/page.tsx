@@ -4,9 +4,12 @@ import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useDropzone } from "react-dropzone";
+import { ArrowLeft, ImageIcon, Loader2, Upload, Wand2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getUploadUrl } from "@/server/actions/upload";
 import { processImage } from "@/server/actions/process";
+import { takePendingFile } from "@/lib/upload-store";
+import { cn } from "@/lib/utils";
 
 const MAX_BYTES = 12 * 1024 * 1024;
 
@@ -16,6 +19,11 @@ export default function NewProjectPage() {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const pending = takePendingFile();
+    if (pending) setFile(pending);
+  }, []);
 
   useEffect(() => {
     if (!file) {
@@ -69,84 +77,104 @@ export default function NewProjectPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-50">
-      <header className="border-b border-zinc-200 bg-white">
-        <div className="mx-auto flex max-w-3xl items-center justify-between px-6 py-4">
-          <Link href="/dashboard" className="text-sm text-zinc-600 hover:text-zinc-900">
-            ← Vissza a projektekhez
-          </Link>
-        </div>
-      </header>
+    <div className="mx-auto max-w-3xl">
+      <Link
+        href="/dashboard"
+        className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+      >
+        <ArrowLeft className="size-4" />
+        Vissza a kezdőlapra
+      </Link>
 
-      <main className="mx-auto max-w-3xl px-6 py-12">
-        <h1 className="mb-8 text-3xl font-semibold tracking-tight">Új projekt</h1>
+      <h1 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
+        Új kép
+      </h1>
+      <p className="mt-2 text-sm text-muted-foreground">
+        Tölts fel egy autós fotót — az AI 2-5 másodperc alatt cseréli a hátteret.
+      </p>
 
-        {error && (
-          <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-            <p className="font-medium">Hiba történt</p>
-            <p>{error}</p>
-            <button
-              type="button"
-              className="mt-2 underline"
-              onClick={() => setError(null)}
-            >
-              Próbáld újra
-            </button>
-          </div>
-        )}
-
-        {!file && (
-          <div
-            {...getRootProps()}
-            className={`flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed py-24 text-center transition-colors ${
-              isDragActive
-                ? "border-primary bg-primary/5"
-                : "border-zinc-300 bg-white hover:bg-zinc-50"
-            }`}
+      {error && (
+        <div className="mt-6 rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700 shadow-soft">
+          <p className="font-medium">Hiba történt</p>
+          <p className="mt-1">{error}</p>
+          <button
+            type="button"
+            className="mt-2 underline underline-offset-2 hover:no-underline"
+            onClick={() => setError(null)}
           >
-            <input {...getInputProps()} />
-            <p className="text-lg font-medium text-zinc-800">
-              Húzd ide az autós képet, vagy kattints a tallózáshoz
-            </p>
-            <p className="mt-2 text-sm text-zinc-500">
-              JPG, PNG, WebP, max 12 MB
-            </p>
-          </div>
-        )}
+            Próbáld újra
+          </button>
+        </div>
+      )}
 
-        {file && previewUrl && (
-          <div className="flex flex-col gap-6">
-            <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={previewUrl}
-                alt="Előnézet"
-                className="max-h-[500px] w-full object-contain"
-              />
-            </div>
-
-            {isProcessing ? (
-              <div className="flex items-center gap-3 rounded-xl bg-blue-50 px-4 py-3 text-sm text-blue-800">
-                <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-blue-300 border-t-blue-700" />
-                <span>Háttér eltávolítása, várj 2-5 másodpercet...</span>
-              </div>
-            ) : (
-              <div className="flex items-center justify-between gap-4">
-                <button
-                  type="button"
-                  className="text-sm text-zinc-600 underline"
-                  onClick={() => setFile(null)}
-                >
-                  Másikat választok
-                </button>
-                <Button onClick={handleSubmit} disabled={isProcessing}>
-                  Feldolgozás indítása
-                </Button>
-              </div>
+      {!file && (
+        <div
+          {...getRootProps()}
+          className={cn(
+            "mt-8 flex cursor-pointer flex-col items-center justify-center rounded-3xl border-2 border-dashed py-24 text-center transition-all",
+            isDragActive
+              ? "border-brand bg-accent/60 shadow-soft-lg"
+              : "border-border bg-white hover:border-brand/40 hover:bg-accent/30",
+          )}
+        >
+          <input {...getInputProps()} />
+          <div
+            className={cn(
+              "mb-5 flex size-16 items-center justify-center rounded-2xl transition-colors",
+              isDragActive
+                ? "bg-brand text-white"
+                : "bg-accent text-accent-foreground",
             )}
+          >
+            <Upload className="size-7" />
           </div>
-        )}
-      </main>
+          <p className="text-lg font-medium text-foreground">
+            Húzd ide az autós képet
+          </p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            vagy <span className="text-brand underline-offset-2 hover:underline">kattints a tallózáshoz</span>
+          </p>
+          <p className="mt-6 text-xs text-muted-foreground">
+            JPG · PNG · WebP · max 12 MB
+          </p>
+        </div>
+      )}
+
+      {file && previewUrl && (
+        <div className="mt-8 flex flex-col gap-6">
+          <div className="overflow-hidden rounded-3xl border border-border/70 bg-white shadow-soft">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={previewUrl}
+              alt="Előnézet"
+              className="max-h-[500px] w-full object-contain"
+            />
+          </div>
+
+          {isProcessing ? (
+            <div className="flex items-center gap-3 rounded-2xl border border-indigo-100 bg-accent/60 px-5 py-4 text-sm text-accent-foreground shadow-soft">
+              <Loader2 className="size-5 animate-spin text-brand" />
+              <span className="font-medium">Háttér cseréje folyamatban</span>
+              <span className="text-muted-foreground">— 2-5 másodperc...</span>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between gap-4">
+              <button
+                type="button"
+                className="inline-flex items-center gap-1.5 text-sm text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+                onClick={() => setFile(null)}
+              >
+                <ImageIcon className="size-4" />
+                Másikat választok
+              </button>
+              <Button onClick={handleSubmit} disabled={isProcessing} size="lg">
+                <Wand2 className="size-4" />
+                Feldolgozás indítása
+              </Button>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }

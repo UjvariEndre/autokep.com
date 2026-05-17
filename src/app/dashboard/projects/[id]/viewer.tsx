@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Download, Loader2, Pencil, RotateCcw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -233,31 +234,45 @@ export function ProjectViewer(props: Props) {
     return (
       <div className="flex flex-col gap-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-lg font-medium text-zinc-700">Szerkesztés</h2>
+          <div>
+            <h2 className="text-lg font-semibold tracking-tight text-foreground">
+              Szerkesztés
+            </h2>
+            <p className="text-xs text-muted-foreground">
+              Állítsd be a forgatást és a pozíciót.
+            </p>
+          </div>
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={handleCancel}
               disabled={saving}
-              className="rounded-lg px-3 py-1.5 text-sm text-zinc-600 hover:bg-zinc-100"
+              className="rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
             >
               Mégsem
             </button>
             <Button onClick={handleSave} disabled={saving || loadingAssets}>
-              {saving ? "Mentés..." : "Mentés"}
+              {saving ? (
+                <>
+                  <Loader2 className="size-4 animate-spin" />
+                  Mentés
+                </>
+              ) : (
+                "Mentés"
+              )}
             </Button>
           </div>
         </div>
 
         {saveError && (
-          <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <div className="rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700 shadow-soft">
             {saveError}
           </div>
         )}
 
-        <div className="flex min-h-[300px] items-center justify-center overflow-hidden rounded-2xl border border-zinc-200 bg-white">
+        <div className="flex min-h-[320px] items-center justify-center overflow-hidden rounded-3xl border border-border/70 bg-gradient-to-br from-secondary to-accent/40 shadow-soft">
           {loadingAssets ? (
-            <span className="inline-block h-8 w-8 animate-spin rounded-full border-2 border-zinc-300 border-t-primary" />
+            <Loader2 className="size-8 animate-spin text-brand" />
           ) : (
             <canvas
               ref={canvasRef}
@@ -266,7 +281,7 @@ export function ProjectViewer(props: Props) {
           )}
         </div>
 
-        <div className="grid gap-4 rounded-2xl border border-zinc-200 bg-white p-5 md:grid-cols-3">
+        <div className="grid gap-6 rounded-3xl border border-border/70 bg-white p-6 shadow-soft md:grid-cols-3">
           <SliderField
             label="Forgatás"
             value={rotateDeg}
@@ -296,15 +311,16 @@ export function ProjectViewer(props: Props) {
           />
         </div>
 
-        <div className="flex items-center justify-between text-sm">
+        <div className="flex flex-col items-start justify-between gap-2 text-sm md:flex-row md:items-center">
           <button
             type="button"
             onClick={handleReset}
-            className="text-zinc-500 underline hover:text-zinc-700"
+            className="inline-flex items-center gap-1.5 text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
           >
+            <RotateCcw className="size-3.5" />
             Alaphelyzet (0°, középre)
           </button>
-          <p className="text-xs text-zinc-500">
+          <p className="text-xs text-muted-foreground">
             Az előnézet kliensoldali — a mentésnél a szerver azonos képletet
             alkalmaz, az eredmény pixel-pontos.
           </p>
@@ -317,10 +333,10 @@ export function ProjectViewer(props: Props) {
   return (
     <div className="grid gap-6 md:grid-cols-2">
       <section>
-        <h2 className="mb-3 text-sm font-medium uppercase tracking-wide text-zinc-500">
+        <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Eredeti
         </h2>
-        <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white">
+        <div className="overflow-hidden rounded-3xl border border-border/70 bg-white shadow-soft">
           {originalUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -329,7 +345,7 @@ export function ProjectViewer(props: Props) {
               className="w-full object-contain"
             />
           ) : (
-            <div className="flex h-64 items-center justify-center text-zinc-400">
+            <div className="flex h-64 items-center justify-center text-muted-foreground">
               Nincs eredeti kép
             </div>
           )}
@@ -337,12 +353,12 @@ export function ProjectViewer(props: Props) {
       </section>
 
       <section>
-        <h2 className="mb-3 text-sm font-medium uppercase tracking-wide text-zinc-500">
+        <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-brand">
           Eredmény
         </h2>
         {status === "DONE" && processedUrl ? (
           <div className="flex flex-col gap-4">
-            <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white">
+            <div className="overflow-hidden rounded-3xl border border-border/70 bg-white shadow-soft">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={processedUrl}
@@ -356,6 +372,7 @@ export function ProjectViewer(props: Props) {
                 download={`${projectName}.jpg`}
                 className={cn(buttonVariants())}
               >
+                <Download className="size-4" />
                 Letöltés
               </a>
               {cutoutUrl && (
@@ -364,30 +381,37 @@ export function ProjectViewer(props: Props) {
                   onClick={handleEnterEdit}
                   className={cn(buttonVariants({ variant: "outline" }))}
                 >
+                  <Pencil className="size-4" />
                   Szerkesztés
                 </button>
               )}
             </div>
           </div>
         ) : status === "PROCESSING" || status === "PENDING" ? (
-          <div className="flex h-64 flex-col items-center justify-center gap-3 rounded-2xl border border-zinc-200 bg-white">
-            <span className="inline-block h-8 w-8 animate-spin rounded-full border-2 border-zinc-300 border-t-primary" />
-            <span className="text-sm text-zinc-600">
+          <div className="flex h-64 flex-col items-center justify-center gap-3 rounded-3xl border border-border/70 bg-gradient-to-br from-secondary to-accent/40 shadow-soft">
+            <Loader2 className="size-8 animate-spin text-brand" />
+            <span className="text-sm font-medium text-foreground">
               Feldolgozás folyamatban...
+            </span>
+            <span className="text-xs text-muted-foreground">
+              2-5 másodperc, frissül magától
             </span>
           </div>
         ) : status === "FAILED" ? (
-          <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-6 text-sm text-red-700">
+          <div className="rounded-3xl border border-rose-200 bg-rose-50 px-5 py-6 text-sm text-rose-700 shadow-soft">
             <p className="mb-2 font-medium">A feldolgozás nem sikerült.</p>
             {errorMessage && (
-              <p className="mb-3 text-red-600">{errorMessage}</p>
+              <p className="mb-3 text-rose-600">{errorMessage}</p>
             )}
-            <Link href="/dashboard/new" className="underline">
-              Új projektet indítok
+            <Link
+              href="/dashboard/new"
+              className="underline underline-offset-2 hover:no-underline"
+            >
+              Új képet indítok
             </Link>
           </div>
         ) : (
-          <div className="flex h-64 items-center justify-center rounded-2xl border border-zinc-200 bg-white text-zinc-400">
+          <div className="flex h-64 items-center justify-center rounded-3xl border border-border/70 bg-white text-muted-foreground shadow-soft">
             Nincs kép
           </div>
         )}
@@ -415,9 +439,9 @@ function SliderField({
 }) {
   return (
     <div>
-      <div className="mb-1 flex items-center justify-between text-sm">
-        <label className="font-medium text-zinc-800">{label}</label>
-        <span className="tabular-nums text-zinc-700">
+      <div className="mb-2 flex items-center justify-between text-sm">
+        <label className="font-medium text-foreground">{label}</label>
+        <span className="rounded-md bg-secondary px-2 py-0.5 text-xs font-semibold tabular-nums text-foreground">
           {value > 0 ? "+" : ""}
           {value.toFixed(step >= 1 ? 0 : 1)}
           {unit}
@@ -430,7 +454,7 @@ function SliderField({
         step={step}
         value={value}
         onChange={(e) => onChange(parseFloat(e.target.value))}
-        className="w-full"
+        className="w-full accent-indigo-600"
       />
     </div>
   );

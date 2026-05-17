@@ -9,7 +9,7 @@ import { getOrCreateUser } from "@/server/users";
 function projectNameFromFilename(filename: string): string {
   const base = filename.split(/[\\/]/).pop() ?? filename;
   const noExt = base.replace(/\.[a-zA-Z0-9]{1,5}$/, "");
-  return (noExt || "Projekt").slice(0, 80);
+  return (noExt || "Kép").slice(0, 80);
 }
 
 function hasUnlimitedCredits(email: string): boolean {
