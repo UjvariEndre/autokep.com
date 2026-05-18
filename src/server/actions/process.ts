@@ -31,11 +31,16 @@ export async function processImage(
     throw new Error("Elfogytak a krediteid.");
   }
 
+  const initialBgType = user.preferredBg ?? "SHOWROOM";
+  const initialBgKey =
+    initialBgType === "CUSTOM" ? user.preferredBgKey : null;
+
   const project = await prisma.project.create({
     data: {
       userId: user.id,
       name: projectNameFromFilename(originalFilename),
-      backgroundType: "SHOWROOM",
+      backgroundType: initialBgType,
+      backgroundUrl: initialBgKey,
     },
   });
 
@@ -58,7 +63,13 @@ export async function processImage(
     const cutoutKey = `cutouts/${user.id}/${image.id}.png`;
     await uploadBuffer(cutoutKey, cutout, "image/png");
 
-    const composed = await composeOnBackground(cutout, "SHOWROOM");
+    const customBg =
+      initialBgType === "CUSTOM" && initialBgKey
+        ? await downloadObject(initialBgKey)
+        : undefined;
+    const composed = await composeOnBackground(cutout, initialBgType, {
+      customBg,
+    });
     const processedKey = `processed/${user.id}/${image.id}.jpg`;
     await uploadBuffer(processedKey, composed, "image/jpeg");
 

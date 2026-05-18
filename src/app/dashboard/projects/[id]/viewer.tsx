@@ -7,14 +7,17 @@ import { Download, Loader2, Pencil, RotateCcw, Trash2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { buttonVariants } from "@/components/ui/button";
 import { DeleteProjectDialog } from "@/components/delete-project-dialog";
+import { BackgroundPicker } from "@/components/background-picker";
 import { cn } from "@/lib/utils";
 import { editImage } from "@/server/actions/edit";
-import type { ProcessStatus } from "@/generated/prisma/enums";
+import type { BackgroundType, ProcessStatus } from "@/generated/prisma/enums";
 
 type Props = {
   projectId: string;
   projectName: string;
   projectCreatedAt: string;
+  backgroundType: BackgroundType;
+  availableCustomKey: string | null;
   imageId: string;
   status: ProcessStatus;
   errorMessage: string | null;
@@ -146,6 +149,8 @@ export function ProjectViewer(props: Props) {
     projectId,
     projectName,
     projectCreatedAt,
+    backgroundType,
+    availableCustomKey,
     imageId,
     status,
     errorMessage,
@@ -336,7 +341,15 @@ export function ProjectViewer(props: Props) {
 
   // ─── VIEW MODE ────────────────────────────────────────────────────────────
   return (
-    <div className="grid gap-6 md:grid-cols-2">
+    <div className="flex flex-col gap-6">
+      {status === "DONE" && cutoutUrl && (
+        <BackgroundPicker
+          imageId={imageId}
+          currentBgType={backgroundType}
+          availableCustomKey={availableCustomKey}
+        />
+      )}
+      <div className="grid gap-6 md:grid-cols-2">
       <section>
         <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           Eredeti
@@ -439,6 +452,7 @@ export function ProjectViewer(props: Props) {
           </div>
         )}
       </section>
+      </div>
     </div>
   );
 }

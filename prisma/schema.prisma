@@ -11,15 +11,17 @@ datasource db {
 }
 
 model User {
-  id           String    @id @default(cuid())
-  clerkId      String    @unique
-  email        String    @unique
-  plan         Plan      @default(FREE)
-  creditsLeft  Int       @default(3)
-  creditsReset DateTime  @default(now())
-  projects     Project[]
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
+  id             String          @id @default(cuid())
+  clerkId        String          @unique
+  email          String          @unique
+  plan           Plan            @default(FREE)
+  creditsLeft    Int             @default(3)
+  creditsReset   DateTime        @default(now())
+  preferredBg    BackgroundType? @map("preferred_bg")
+  preferredBgKey String?         @map("preferred_bg_key")
+  projects       Project[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
 }
 
 model Project {

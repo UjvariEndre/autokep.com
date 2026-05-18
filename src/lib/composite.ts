@@ -25,6 +25,14 @@ const PRESETS: Partial<Record<BackgroundType, Preset>> = {
   },
 };
 
+// Defaults used when the user supplies a custom background (CUSTOM) — same
+// floor/scale as SHOWROOM so cars sit roughly where users expect.
+const CUSTOM_DEFAULTS = {
+  floorY: 0.88,
+  carWidthScale: 0.65,
+  cropTop: 0,
+};
+
 // alpha > SOLID = car body (used for anchoring the wheels at floorY)
 // alpha > 0     = car body + drop shadow (used to extract the full visible region)
 const SOLID_ALPHA_THRESHOLD = 200;
@@ -84,6 +92,8 @@ export type ComposeOpts = {
   rotateDeg?: number;
   offsetXPct?: number; // -50..50, percent of canvas width
   offsetYPct?: number; // -50..50, percent of canvas height
+  /** Custom background bytes — required when preset === "CUSTOM". */
+  customBg?: Buffer;
 };
 
 export async function composeOnBackground(
@@ -91,9 +101,22 @@ export async function composeOnBackground(
   preset: BackgroundType,
   opts: ComposeOpts = {},
 ): Promise<Buffer> {
-  const cfg = PRESETS[preset];
-  if (!cfg) {
-    throw new Error(`Nincs preset konfigurálva ehhez: ${preset}`);
+  let cfg: Pick<Preset, "floorY" | "carWidthScale" | "cropTop">;
+  let bgSrc: Buffer;
+
+  if (preset === "CUSTOM") {
+    if (!opts.customBg) {
+      throw new Error("CUSTOM háttérhez kötelező a customBg buffer.");
+    }
+    cfg = CUSTOM_DEFAULTS;
+    bgSrc = opts.customBg;
+  } else {
+    const presetCfg = PRESETS[preset];
+    if (!presetCfg) {
+      throw new Error(`Nincs preset konfigurálva ehhez: ${preset}`);
+    }
+    cfg = presetCfg;
+    bgSrc = await loadBackground(presetCfg.imageFile);
   }
 
   const rotateDeg = opts.rotateDeg ?? 0;
@@ -117,7 +140,6 @@ export async function composeOnBackground(
   }
 
   // 1. Background: optional top-crop (zoom in), then cover-fit, strip alpha.
-  const bgSrc = await loadBackground(cfg.imageFile);
   let bgPipeline = sharp(bgSrc);
   if (cfg.cropTop && cfg.cropTop > 0) {
     const bgMeta = await sharp(bgSrc).metadata();

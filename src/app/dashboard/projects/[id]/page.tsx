@@ -67,6 +67,8 @@ export default async function ProjectPage({
           projectId={project.id}
           projectName={project.name}
           projectCreatedAt={project.createdAt.toISOString()}
+          backgroundType={project.backgroundType}
+          availableCustomKey={project.backgroundUrl ?? user.preferredBgKey}
           imageId={image.id}
           status={image.status}
           errorMessage={image.errorMessage}
