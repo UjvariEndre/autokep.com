@@ -48,6 +48,7 @@ model Image {
   rotateDeg    Float         @default(0)
   offsetXPct   Float         @default(0)
   offsetYPct   Float         @default(0)
+  zoom         Float         @default(1)
   status       ProcessStatus @default(PENDING)
   errorMessage String?
   createdAt    DateTime      @default(now())

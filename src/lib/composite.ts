@@ -92,6 +92,7 @@ export type ComposeOpts = {
   rotateDeg?: number;
   offsetXPct?: number; // -50..50, percent of canvas width
   offsetYPct?: number; // -50..50, percent of canvas height
+  zoom?: number; // 0.5..2.0, multiplier on the auto-fit car scale
   /** Custom background bytes — required when preset === "CUSTOM". */
   customBg?: Buffer;
 };
@@ -122,6 +123,7 @@ export async function composeOnBackground(
   const rotateDeg = opts.rotateDeg ?? 0;
   const offsetXPct = opts.offsetXPct ?? 0;
   const offsetYPct = opts.offsetYPct ?? 0;
+  const zoom = opts.zoom ?? 1;
 
   // Rotation: positive = clockwise, applied before bbox/scale/compose. All
   // downstream sizing operates on the rotated buffer's coordinate space.
@@ -175,9 +177,13 @@ export async function composeOnBackground(
   // then clamp it so the extracted region still fits inside the canvas. If
   // the photo is very loosely cropped (or the car aspect is very different
   // from the canvas), this gracefully shrinks the car instead of crashing.
+  // User zoom multiplies the auto-fit scale; clamp on visible-extract still
+  // applies at zoom <= 1, but is bypassed above 1 so the car can overflow
+  // the canvas (Sharp clips the overflow at composite time).
   const desiredScale = (canvasW * cfg.carWidthScale) / solid.w;
   const maxScale = Math.min(canvasW / visible.w, canvasH / visible.h);
-  const scale = Math.min(desiredScale, maxScale);
+  const baseScale = Math.min(desiredScale, maxScale);
+  const scale = baseScale * zoom;
 
   const scaledExtractW = Math.max(1, Math.round(visible.w * scale));
   const scaledExtractH = Math.max(1, Math.round(visible.h * scale));
@@ -201,10 +207,14 @@ export async function composeOnBackground(
   // Clamp offsets to keep the extract inside the canvas. Asymmetric shadows
   // can push the math off-center; clamping keeps Sharp happy at the cost of
   // a few pixels of off-center placement in those edge cases.
+  // When zoom > 1 the extract is larger than the canvas; we allow negative
+  // insert coords so the user can pan a zoomed-in car (Sharp clips it).
   const rawLeft = canvasW / 2 - scaledSolidCenterX + offsetPxX;
   const rawTop = canvasH * cfg.floorY - scaledSolidBottomY + offsetPxY;
-  const insertLeft = Math.max(0, Math.min(canvasW - scaledExtractW, Math.round(rawLeft)));
-  const insertTop = Math.max(0, Math.min(canvasH - scaledExtractH, Math.round(rawTop)));
+  const slackX = canvasW - scaledExtractW;
+  const slackY = canvasH - scaledExtractH;
+  const insertLeft = Math.max(Math.min(0, slackX), Math.min(Math.max(0, slackX), Math.round(rawLeft)));
+  const insertTop = Math.max(Math.min(0, slackY), Math.min(Math.max(0, slackY), Math.round(rawTop)));
 
   return sharp(backgroundCanvas)
     .composite([{ input: scaledCar, left: insertLeft, top: insertTop }])

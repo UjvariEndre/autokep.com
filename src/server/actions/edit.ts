@@ -10,6 +10,7 @@ export async function editImage(
   rotateDeg: number,
   offsetXPct: number,
   offsetYPct: number,
+  zoom: number,
 ): Promise<void> {
   const user = await getOrCreateUser();
 
@@ -29,12 +30,14 @@ export async function editImage(
   const safeRotate = Math.max(-15, Math.min(15, Number(rotateDeg) || 0));
   const safeX = Math.max(-50, Math.min(50, Number(offsetXPct) || 0));
   const safeY = Math.max(-50, Math.min(50, Number(offsetYPct) || 0));
+  const safeZoom = Math.max(0.5, Math.min(2, Number(zoom) || 1));
 
   const cutoutBuf = await downloadObject(image.cutoutKey);
   const composed = await composeOnBackground(cutoutBuf, image.project.backgroundType, {
     rotateDeg: safeRotate,
     offsetXPct: safeX,
     offsetYPct: safeY,
+    zoom: safeZoom,
   });
 
   // Overwrite the same R2 key so the downloaded file stays at a stable URL.
@@ -46,6 +49,7 @@ export async function editImage(
       rotateDeg: safeRotate,
       offsetXPct: safeX,
       offsetYPct: safeY,
+      zoom: safeZoom,
     },
   });
 }

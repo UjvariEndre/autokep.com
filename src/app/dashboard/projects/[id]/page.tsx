@@ -75,6 +75,7 @@ export default async function ProjectPage({
           initialRotate={image.rotateDeg}
           initialOffsetX={image.offsetXPct}
           initialOffsetY={image.offsetYPct}
+          initialZoom={image.zoom}
           originalUrl={originalUrl}
           processedUrl={processedUrl}
           downloadUrl={downloadUrl}

@@ -24,6 +24,7 @@ type Props = {
   initialRotate: number;
   initialOffsetX: number;
   initialOffsetY: number;
+  initialZoom: number;
   originalUrl: string | null;
   processedUrl: string | null;
   downloadUrl: string | null;
@@ -57,6 +58,7 @@ function compose(
   rotateDeg: number,
   offsetXPct: number,
   offsetYPct: number,
+  zoom: number,
 ) {
   // Canvas dimensions = bounding box of rotated cutout (matches Sharp default).
   const angleRad = (rotateDeg * Math.PI) / 180;
@@ -120,10 +122,12 @@ function compose(
   const visW = vMaxX - vMinX + 1;
   const visH = vMaxY - vMinY + 1;
 
-  // 4. Scale: body to 65% canvas, clamp so the visible region fits.
+  // 4. Scale: body to 65% canvas, clamp so the visible region fits, then
+  // apply user zoom (>1 lets the car overflow the canvas).
   const desired = (W * CAR_WIDTH_SCALE) / solidW;
   const maxScale = Math.min(W / visW, H / visH);
-  const scale = Math.min(desired, maxScale);
+  const baseScale = Math.min(desired, maxScale);
+  const scale = baseScale * zoom;
   const sVW = Math.max(1, Math.round(visW * scale));
   const sVH = Math.max(1, Math.round(visH * scale));
 
@@ -137,8 +141,10 @@ function compose(
   const offsetPxY = (offsetYPct / 100) * H;
   const rawLeft = W / 2 - scaledSolidCx + offsetPxX;
   const rawTop = H * FLOOR_Y - scaledSolidBy + offsetPxY;
-  const insLeft = Math.max(0, Math.min(W - sVW, Math.round(rawLeft)));
-  const insTop = Math.max(0, Math.min(H - sVH, Math.round(rawTop)));
+  const slackX = W - sVW;
+  const slackY = H - sVH;
+  const insLeft = Math.max(Math.min(0, slackX), Math.min(Math.max(0, slackX), Math.round(rawLeft)));
+  const insTop = Math.max(Math.min(0, slackY), Math.min(Math.max(0, slackY), Math.round(rawTop)));
 
   // 6. Draw scaled visible region of the rotated cutout.
   ctx.drawImage(off, vMinX, vMinY, visW, visH, insLeft, insTop, sVW, sVH);
@@ -157,6 +163,7 @@ export function ProjectViewer(props: Props) {
     initialRotate,
     initialOffsetX,
     initialOffsetY,
+    initialZoom,
     originalUrl,
     processedUrl,
     downloadUrl,
@@ -168,6 +175,7 @@ export function ProjectViewer(props: Props) {
   const [rotateDeg, setRotateDeg] = useState(initialRotate);
   const [offsetX, setOffsetX] = useState(initialOffsetX);
   const [offsetY, setOffsetY] = useState(initialOffsetY);
+  const [zoom, setZoom] = useState(initialZoom);
 
   const [cutoutImg, setCutoutImg] = useState<HTMLImageElement | null>(null);
   const [bgImg, setBgImg] = useState<HTMLImageElement | null>(null);
@@ -204,8 +212,8 @@ export function ProjectViewer(props: Props) {
   useEffect(() => {
     if (mode !== "edit") return;
     if (!cutoutImg || !bgImg || !canvasRef.current) return;
-    compose(canvasRef.current, cutoutImg, bgImg, rotateDeg, offsetX, offsetY);
-  }, [mode, cutoutImg, bgImg, rotateDeg, offsetX, offsetY]);
+    compose(canvasRef.current, cutoutImg, bgImg, rotateDeg, offsetX, offsetY, zoom);
+  }, [mode, cutoutImg, bgImg, rotateDeg, offsetX, offsetY, zoom]);
 
   const handleEnterEdit = useCallback(() => {
     setSaveError(null);
@@ -216,20 +224,22 @@ export function ProjectViewer(props: Props) {
     setRotateDeg(initialRotate);
     setOffsetX(initialOffsetX);
     setOffsetY(initialOffsetY);
+    setZoom(initialZoom);
     setMode("view");
-  }, [initialRotate, initialOffsetX, initialOffsetY]);
+  }, [initialRotate, initialOffsetX, initialOffsetY, initialZoom]);
 
   const handleReset = useCallback(() => {
     setRotateDeg(0);
     setOffsetX(0);
     setOffsetY(0);
+    setZoom(1);
   }, []);
 
   const handleSave = useCallback(async () => {
     setSaving(true);
     setSaveError(null);
     try {
-      await editImage(imageId, rotateDeg, offsetX, offsetY);
+      await editImage(imageId, rotateDeg, offsetX, offsetY, zoom);
       setMode("view");
       router.refresh();
     } catch (err) {
@@ -237,7 +247,7 @@ export function ProjectViewer(props: Props) {
     } finally {
       setSaving(false);
     }
-  }, [imageId, rotateDeg, offsetX, offsetY, router]);
+  }, [imageId, rotateDeg, offsetX, offsetY, zoom, router]);
 
   // ─── EDIT MODE ────────────────────────────────────────────────────────────
   if (mode === "edit") {
@@ -291,7 +301,7 @@ export function ProjectViewer(props: Props) {
           )}
         </div>
 
-        <div className="grid gap-6 rounded-3xl border border-border/70 bg-white p-6 shadow-soft md:grid-cols-3">
+        <div className="grid gap-6 rounded-3xl border border-border/70 bg-white p-6 shadow-soft sm:grid-cols-2 lg:grid-cols-4">
           <SliderField
             label="Forgatás"
             value={rotateDeg}
@@ -300,6 +310,17 @@ export function ProjectViewer(props: Props) {
             step={0.5}
             unit="°"
             onChange={setRotateDeg}
+          />
+          <SliderField
+            label="Nagyítás"
+            value={zoom}
+            min={0.5}
+            max={2}
+            step={0.05}
+            unit="x"
+            showSign={false}
+            decimals={2}
+            onChange={setZoom}
           />
           <SliderField
             label="Vízszintes (X)"
@@ -464,6 +485,8 @@ function SliderField({
   max,
   step,
   unit,
+  showSign = true,
+  decimals,
   onChange,
 }: {
   label: string;
@@ -472,15 +495,18 @@ function SliderField({
   max: number;
   step: number;
   unit: string;
+  showSign?: boolean;
+  decimals?: number;
   onChange: (v: number) => void;
 }) {
+  const fractionDigits = decimals ?? (step >= 1 ? 0 : 1);
   return (
     <div>
       <div className="mb-2 flex items-center justify-between text-sm">
         <label className="font-medium text-foreground">{label}</label>
         <span className="rounded-md bg-secondary px-2 py-0.5 text-xs font-semibold tabular-nums text-foreground">
-          {value > 0 ? "+" : ""}
-          {value.toFixed(step >= 1 ? 0 : 1)}
+          {showSign && value > 0 ? "+" : ""}
+          {value.toFixed(fractionDigits)}
           {unit}
         </span>
       </div>
