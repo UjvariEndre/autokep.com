@@ -3,6 +3,11 @@ import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { getPresignedDownloadUrl } from "@/lib/r2";
+import {
+  DEFAULT_SHOWROOM_KEY,
+  isShowroomKey,
+  showroomPublicPath,
+} from "@/lib/backgrounds";
 import { getOrCreateUser } from "@/server/users";
 import { ProjectViewer } from "./viewer";
 
@@ -48,6 +53,25 @@ export default async function ProjectPage({
       ? await getPresignedDownloadUrl(image.cutoutKey, 3600)
       : null;
 
+  // The user may have a custom background saved as preference even if this
+  // project currently uses a showroom preset — surface it so the picker can
+  // show a thumbnail to switch back to without re-uploading.
+  const savedCustomKey =
+    project.backgroundType === "CUSTOM" && project.backgroundUrl
+      ? project.backgroundUrl
+      : user.preferredBgKey;
+  const savedCustomUrl = savedCustomKey
+    ? await getPresignedDownloadUrl(savedCustomKey, 3600)
+    : null;
+
+  const resolvedPresetKey = isShowroomKey(project.backgroundPresetKey)
+    ? project.backgroundPresetKey
+    : DEFAULT_SHOWROOM_KEY;
+  const bgPreviewUrl =
+    project.backgroundType === "CUSTOM" && project.backgroundUrl
+      ? await getPresignedDownloadUrl(project.backgroundUrl, 3600)
+      : showroomPublicPath(resolvedPresetKey);
+
   return (
     <>
       <Link
@@ -68,7 +92,10 @@ export default async function ProjectPage({
           projectName={project.name}
           projectCreatedAt={project.createdAt.toISOString()}
           backgroundType={project.backgroundType}
-          availableCustomKey={project.backgroundUrl ?? user.preferredBgKey}
+          currentPresetKey={resolvedPresetKey}
+          savedCustomKey={savedCustomKey ?? null}
+          savedCustomUrl={savedCustomUrl}
+          bgPreviewUrl={bgPreviewUrl}
           imageId={image.id}
           status={image.status}
           errorMessage={image.errorMessage}

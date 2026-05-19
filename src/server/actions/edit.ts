@@ -33,11 +33,17 @@ export async function editImage(
   const safeZoom = Math.max(0.5, Math.min(2, Number(zoom) || 1));
 
   const cutoutBuf = await downloadObject(image.cutoutKey);
+  const customBg =
+    image.project.backgroundType === "CUSTOM" && image.project.backgroundUrl
+      ? await downloadObject(image.project.backgroundUrl)
+      : undefined;
   const composed = await composeOnBackground(cutoutBuf, image.project.backgroundType, {
     rotateDeg: safeRotate,
     offsetXPct: safeX,
     offsetYPct: safeY,
     zoom: safeZoom,
+    presetKey: image.project.backgroundPresetKey,
+    customBg,
   });
 
   // Overwrite the same R2 key so the downloaded file stays at a stable URL.

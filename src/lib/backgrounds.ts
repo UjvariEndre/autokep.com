@@ -1,0 +1,34 @@
+// Registry of selectable preset backgrounds. Shared between the server
+// (composite.ts uses the key to load the actual file from /public/images/)
+// and the client (BackgroundPicker renders thumbnails by key).
+
+export type ShowroomPreset = {
+  key: string;
+  label: string;
+};
+
+export const SHOWROOM_PRESETS: readonly ShowroomPreset[] = [
+  { key: "showroom1.jpg", label: "Showroom 1" },
+  { key: "showroom2.jpg", label: "Showroom 2" },
+  { key: "showroom3.jpg", label: "Showroom 3" },
+  { key: "showroom4.jpg", label: "Showroom 4" },
+  { key: "showroom5.jpg", label: "Showroom 5" },
+  { key: "showroom6.jpg", label: "Showroom 6" },
+  { key: "showroom7.jpg", label: "Showroom 7" },
+  { key: "showroom8.jpg", label: "Showroom 8" },
+  { key: "showroom9.jpg", label: "Showroom 9" },
+  { key: "showroom10.jpg", label: "Showroom 10" },
+  { key: "showroom11.jpg", label: "Showroom 11" },
+  { key: "showroom12.jpg", label: "Showroom 12" },
+];
+
+export const DEFAULT_SHOWROOM_KEY = "showroom1.jpg";
+
+export function isShowroomKey(key: string | null | undefined): key is string {
+  if (!key) return false;
+  return SHOWROOM_PRESETS.some((p) => p.key === key);
+}
+
+export function showroomPublicPath(key: string): string {
+  return `/images/${key}`;
+}

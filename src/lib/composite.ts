@@ -2,9 +2,9 @@ import { readFile } from "node:fs/promises";
 import path from "node:path";
 import sharp from "sharp";
 import type { BackgroundType } from "@/generated/prisma/enums";
+import { DEFAULT_SHOWROOM_KEY, isShowroomKey } from "./backgrounds";
 
-type Preset = {
-  imageFile: string;
+type Cfg = {
   // 0..1 fraction of canvas height where the car body's bottom (wheels line)
   // should sit. The drop shadow naturally extends below this point.
   floorY: number;
@@ -16,18 +16,16 @@ type Preset = {
   cropTop?: number;
 };
 
-const PRESETS: Partial<Record<BackgroundType, Preset>> = {
-  SHOWROOM: {
-    imageFile: "shr02.png",
-    floorY: 0.88,
-    carWidthScale: 0.65,
-    cropTop: 0.10,
-  },
+// All showroom presets currently share the same framing.
+const SHOWROOM_CFG: Cfg = {
+  floorY: 0.88,
+  carWidthScale: 0.65,
+  cropTop: 0.10,
 };
 
 // Defaults used when the user supplies a custom background (CUSTOM) — same
 // floor/scale as SHOWROOM so cars sit roughly where users expect.
-const CUSTOM_DEFAULTS = {
+const CUSTOM_DEFAULTS: Cfg = {
   floorY: 0.88,
   carWidthScale: 0.65,
   cropTop: 0,
@@ -93,6 +91,8 @@ export type ComposeOpts = {
   offsetXPct?: number; // -50..50, percent of canvas width
   offsetYPct?: number; // -50..50, percent of canvas height
   zoom?: number; // 0.5..2.0, multiplier on the auto-fit car scale
+  /** Which showroom preset file to use; falls back to DEFAULT_SHOWROOM_KEY. */
+  presetKey?: string | null;
   /** Custom background bytes — required when preset === "CUSTOM". */
   customBg?: Buffer;
 };
@@ -102,7 +102,7 @@ export async function composeOnBackground(
   preset: BackgroundType,
   opts: ComposeOpts = {},
 ): Promise<Buffer> {
-  let cfg: Pick<Preset, "floorY" | "carWidthScale" | "cropTop">;
+  let cfg: Cfg;
   let bgSrc: Buffer;
 
   if (preset === "CUSTOM") {
@@ -111,13 +111,12 @@ export async function composeOnBackground(
     }
     cfg = CUSTOM_DEFAULTS;
     bgSrc = opts.customBg;
+  } else if (preset === "SHOWROOM") {
+    const key = isShowroomKey(opts.presetKey) ? opts.presetKey : DEFAULT_SHOWROOM_KEY;
+    cfg = SHOWROOM_CFG;
+    bgSrc = await loadBackground(key);
   } else {
-    const presetCfg = PRESETS[preset];
-    if (!presetCfg) {
-      throw new Error(`Nincs preset konfigurálva ehhez: ${preset}`);
-    }
-    cfg = presetCfg;
-    bgSrc = await loadBackground(presetCfg.imageFile);
+    throw new Error(`Nincs preset konfigurálva ehhez: ${preset}`);
   }
 
   const rotateDeg = opts.rotateDeg ?? 0;

@@ -17,7 +17,10 @@ type Props = {
   projectName: string;
   projectCreatedAt: string;
   backgroundType: BackgroundType;
-  availableCustomKey: string | null;
+  currentPresetKey: string;
+  savedCustomKey: string | null;
+  savedCustomUrl: string | null;
+  bgPreviewUrl: string;
   imageId: string;
   status: ProcessStatus;
   errorMessage: string | null;
@@ -30,8 +33,6 @@ type Props = {
   downloadUrl: string | null;
   cutoutUrl: string | null;
 };
-
-const SHOWROOM_URL = "/images/shr02.png";
 
 // Match composite.ts SHOWROOM preset.
 const FLOOR_Y = 0.88;
@@ -156,7 +157,10 @@ export function ProjectViewer(props: Props) {
     projectName,
     projectCreatedAt,
     backgroundType,
-    availableCustomKey,
+    currentPresetKey,
+    savedCustomKey,
+    savedCustomUrl,
+    bgPreviewUrl,
     imageId,
     status,
     errorMessage,
@@ -185,13 +189,18 @@ export function ProjectViewer(props: Props) {
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // Load cutout + background once we enter edit mode.
+  // Load cutout + background once we enter edit mode. Re-loads the bg if the
+  // user switched backgrounds between edits (bgPreviewUrl changes).
   useEffect(() => {
     if (mode !== "edit" || !cutoutUrl) return;
-    if (cutoutImg && bgImg) return;
+    const haveCurrentBg = bgImg?.src.endsWith(bgPreviewUrl) ?? false;
+    if (cutoutImg && haveCurrentBg) return;
     let cancelled = false;
     setLoadingAssets(true);
-    Promise.all([loadImage(cutoutUrl, true), loadImage(SHOWROOM_URL)])
+    const cutoutP = cutoutImg
+      ? Promise.resolve(cutoutImg)
+      : loadImage(cutoutUrl, true);
+    Promise.all([cutoutP, loadImage(bgPreviewUrl, true)])
       .then(([c, b]) => {
         if (cancelled) return;
         setCutoutImg(c);
@@ -206,7 +215,7 @@ export function ProjectViewer(props: Props) {
     return () => {
       cancelled = true;
     };
-  }, [mode, cutoutUrl, cutoutImg, bgImg]);
+  }, [mode, cutoutUrl, bgPreviewUrl, cutoutImg, bgImg]);
 
   // Re-compose canvas whenever inputs change.
   useEffect(() => {
@@ -367,7 +376,9 @@ export function ProjectViewer(props: Props) {
         <BackgroundPicker
           imageId={imageId}
           currentBgType={backgroundType}
-          availableCustomKey={availableCustomKey}
+          currentPresetKey={currentPresetKey}
+          savedCustomKey={savedCustomKey}
+          savedCustomUrl={savedCustomUrl}
         />
       )}
       <div className="grid gap-6 md:grid-cols-2">

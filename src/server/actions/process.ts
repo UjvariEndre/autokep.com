@@ -4,6 +4,7 @@ import { prisma } from "@/lib/prisma";
 import { downloadObject, uploadBuffer } from "@/lib/r2";
 import { removeCarBackground } from "@/lib/removebg";
 import { composeOnBackground } from "@/lib/composite";
+import { DEFAULT_SHOWROOM_KEY, isShowroomKey } from "@/lib/backgrounds";
 import { getOrCreateUser } from "@/server/users";
 
 function projectNameFromFilename(filename: string): string {
@@ -34,6 +35,12 @@ export async function processImage(
   const initialBgType = user.preferredBg ?? "SHOWROOM";
   const initialBgKey =
     initialBgType === "CUSTOM" ? user.preferredBgKey : null;
+  const initialPresetKey =
+    initialBgType === "SHOWROOM"
+      ? isShowroomKey(user.preferredBgPresetKey)
+        ? user.preferredBgPresetKey
+        : DEFAULT_SHOWROOM_KEY
+      : null;
 
   const project = await prisma.project.create({
     data: {
@@ -41,6 +48,7 @@ export async function processImage(
       name: projectNameFromFilename(originalFilename),
       backgroundType: initialBgType,
       backgroundUrl: initialBgKey,
+      backgroundPresetKey: initialPresetKey,
     },
   });
 
@@ -69,6 +77,7 @@ export async function processImage(
         : undefined;
     const composed = await composeOnBackground(cutout, initialBgType, {
       customBg,
+      presetKey: initialPresetKey,
     });
     const processedKey = `processed/${user.id}/${image.id}.jpg`;
     await uploadBuffer(processedKey, composed, "image/jpeg");

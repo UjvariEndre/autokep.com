@@ -9,6 +9,10 @@ import {
   uploadBuffer,
 } from "@/lib/r2";
 import { composeOnBackground } from "@/lib/composite";
+import {
+  DEFAULT_SHOWROOM_KEY,
+  isShowroomKey,
+} from "@/lib/backgrounds";
 import { getOrCreateUser } from "@/server/users";
 import type { BackgroundType } from "@/generated/prisma/enums";
 
@@ -38,16 +42,21 @@ export async function getCustomBackgroundUploadUrl(
   return { url, key };
 }
 
+export type ChangeBackgroundOpts = {
+  presetKey?: string | null;
+  customKey?: string | null;
+};
+
 /**
  * Recompose an image with a new background and persist:
- *  - Project.backgroundType (+ backgroundUrl for CUSTOM)
- *  - User.preferredBg / preferredBgKey (so future projects start with this)
+ *  - Project.backgroundType, backgroundPresetKey, backgroundUrl
+ *  - User.preferredBg* (so the next upload defaults to this choice)
  *  - Processed image is overwritten on the same R2 key.
  */
 export async function changeBackground(
   imageId: string,
   bgType: BackgroundType,
-  customKey: string | null,
+  opts: ChangeBackgroundOpts = {},
 ): Promise<void> {
   const user = await getOrCreateUser();
 
@@ -64,20 +73,31 @@ export async function changeBackground(
     );
   }
 
-  if (bgType === "CUSTOM" && !customKey) {
-    throw new Error("CUSTOM háttérhez kötelező a kulcs.");
+  let resolvedPresetKey: string | null = null;
+  let resolvedCustomKey: string | null = null;
+
+  if (bgType === "CUSTOM") {
+    if (!opts.customKey) throw new Error("CUSTOM háttérhez kötelező a kulcs.");
+    resolvedCustomKey = opts.customKey;
+  } else if (bgType === "SHOWROOM") {
+    resolvedPresetKey = isShowroomKey(opts.presetKey)
+      ? opts.presetKey
+      : DEFAULT_SHOWROOM_KEY;
+  } else {
+    throw new Error(`Nem támogatott háttér típus: ${bgType}`);
   }
 
   const cutoutBuf = await downloadObject(image.cutoutKey);
-  const customBg =
-    bgType === "CUSTOM" && customKey
-      ? await downloadObject(customKey)
-      : undefined;
+  const customBg = resolvedCustomKey
+    ? await downloadObject(resolvedCustomKey)
+    : undefined;
 
   const composed = await composeOnBackground(cutoutBuf, bgType, {
     rotateDeg: image.rotateDeg,
     offsetXPct: image.offsetXPct,
     offsetYPct: image.offsetYPct,
+    zoom: image.zoom,
+    presetKey: resolvedPresetKey,
     customBg,
   });
 
@@ -88,14 +108,20 @@ export async function changeBackground(
       where: { id: image.projectId },
       data: {
         backgroundType: bgType,
-        backgroundUrl: bgType === "CUSTOM" ? customKey : null,
+        backgroundUrl: resolvedCustomKey,
+        backgroundPresetKey: resolvedPresetKey,
       },
     }),
     prisma.user.update({
       where: { id: user.id },
       data: {
         preferredBg: bgType,
-        preferredBgKey: bgType === "CUSTOM" ? customKey : null,
+        // Keep the "other-mode" preference so e.g. switching to a showroom
+        // doesn't forget the user's previously uploaded custom bg.
+        preferredBgKey:
+          resolvedCustomKey ?? user.preferredBgKey ?? null,
+        preferredBgPresetKey:
+          resolvedPresetKey ?? user.preferredBgPresetKey ?? null,
       },
     }),
   ]);

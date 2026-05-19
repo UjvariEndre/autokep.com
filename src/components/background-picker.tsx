@@ -2,91 +2,86 @@
 
 import { useCallback, useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Select } from "@base-ui/react/select";
-import { Check, ChevronDown, ImagePlus, Loader2 } from "lucide-react";
+import { Check, ImagePlus, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   changeBackground,
   getCustomBackgroundUploadUrl,
 } from "@/server/actions/background";
+import { SHOWROOM_PRESETS, showroomPublicPath } from "@/lib/backgrounds";
 import type { BackgroundType } from "@/generated/prisma/enums";
 
 type Props = {
   imageId: string;
   currentBgType: BackgroundType;
-  /** A jelenlegi projekt custom kulcsa, vagy a user korábban mentett preferenciája. */
-  availableCustomKey: string | null;
+  currentPresetKey: string;
+  /** R2 key of a previously uploaded custom bg, if any. */
+  savedCustomKey: string | null;
+  /** Presigned URL for the saved custom bg thumbnail. */
+  savedCustomUrl: string | null;
 };
 
-const PRESETS: Array<{ value: BackgroundType; label: string }> = [
-  { value: "SHOWROOM", label: "Showroom" },
-];
-
 const MAX_BYTES = 12 * 1024 * 1024;
-
-type SelectionValue = "preset:SHOWROOM" | "custom";
-
-function currentSelection(
-  bgType: BackgroundType,
-  availableCustomKey: string | null,
-): SelectionValue {
-  if (bgType === "CUSTOM" && availableCustomKey) return "custom";
-  return "preset:SHOWROOM";
-}
 
 export function BackgroundPicker({
   imageId,
   currentBgType,
-  availableCustomKey,
+  currentPresetKey,
+  savedCustomKey,
+  savedCustomUrl,
 }: Props) {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [customKey, setCustomKey] = useState<string | null>(availableCustomKey);
-  const [busy, setBusy] = useState(false);
+  const [busyKey, setBusyKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [, startTransition] = useTransition();
 
-  const selection = currentSelection(currentBgType, customKey);
+  const busy = busyKey !== null;
 
-  const apply = useCallback(
-    async (next: SelectionValue, keyOverride?: string) => {
+  const applyShowroom = useCallback(
+    async (presetKey: string) => {
       if (busy) return;
+      if (currentBgType === "SHOWROOM" && presetKey === currentPresetKey) return;
       setError(null);
-      setBusy(true);
+      setBusyKey(`preset:${presetKey}`);
       try {
-        if (next === "custom") {
-          const key = keyOverride ?? customKey;
-          if (!key) throw new Error("Nincs feltöltött saját háttér.");
-          await changeBackground(imageId, "CUSTOM", key);
-        } else {
-          await changeBackground(imageId, "SHOWROOM", null);
-        }
+        await changeBackground(imageId, "SHOWROOM", { presetKey });
         startTransition(() => router.refresh());
       } catch (err) {
         setError(err instanceof Error ? err.message : String(err));
       } finally {
-        setBusy(false);
+        setBusyKey(null);
       }
     },
-    [busy, customKey, imageId, router],
+    [busy, currentBgType, currentPresetKey, imageId, router],
   );
 
-  const handleSelect = useCallback(
-    (val: SelectionValue) => {
-      if (val === selection) return;
-      void apply(val);
+  const applyCustom = useCallback(
+    async (customKey: string) => {
+      if (busy) return;
+      setError(null);
+      setBusyKey(`custom:${customKey}`);
+      try {
+        await changeBackground(imageId, "CUSTOM", { customKey });
+        startTransition(() => router.refresh());
+      } catch (err) {
+        setError(err instanceof Error ? err.message : String(err));
+      } finally {
+        setBusyKey(null);
+      }
     },
-    [apply, selection],
+    [busy, imageId, router],
   );
 
   const handleUpload = useCallback(
     async (file: File) => {
+      if (busy) return;
       setError(null);
       if (file.size > MAX_BYTES) {
         setError("A háttérkép max 12 MB lehet.");
         return;
       }
-      setBusy(true);
+      setBusyKey("upload");
       try {
         const { url, key } = await getCustomBackgroundUploadUrl(
           file.name,
@@ -100,15 +95,15 @@ export function BackgroundPicker({
         if (!putRes.ok) {
           throw new Error(`R2 feltöltés hibázott (HTTP ${putRes.status}).`);
         }
-        setCustomKey(key);
-        await apply("custom", key);
+        await changeBackground(imageId, "CUSTOM", { customKey: key });
+        startTransition(() => router.refresh());
       } catch (err) {
         setError(err instanceof Error ? err.message : String(err));
       } finally {
-        setBusy(false);
+        setBusyKey(null);
       }
     },
-    [apply],
+    [busy, imageId, router],
   );
 
   return (
@@ -120,94 +115,142 @@ export function BackgroundPicker({
         {busy && <Loader2 className="size-4 animate-spin text-brand" />}
       </div>
 
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-        <Select.Root
-          value={selection}
-          onValueChange={(v) => handleSelect(v as SelectionValue)}
-          disabled={busy}
-        >
-          <Select.Trigger
-            className={cn(
-              "flex h-10 w-full items-center justify-between gap-2 rounded-full border border-border bg-white px-4 text-sm font-medium text-foreground",
-              "hover:bg-secondary focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40",
-              "disabled:pointer-events-none disabled:opacity-60 sm:w-64",
-            )}
-          >
-            <Select.Value>
-              {(value) =>
-                value === "custom" ? "Saját háttér" : "Showroom"
-              }
-            </Select.Value>
-            <Select.Icon>
-              <ChevronDown className="size-4 text-muted-foreground" />
-            </Select.Icon>
-          </Select.Trigger>
-          <Select.Portal>
-            <Select.Positioner sideOffset={4} className="z-50">
-              <Select.Popup
-                className={cn(
-                  "min-w-[var(--anchor-width)] overflow-hidden rounded-2xl border border-border/70 bg-white p-1 shadow-soft-lg",
-                  "data-[ending-style]:opacity-0 data-[starting-style]:opacity-0 transition-opacity",
-                )}
-              >
-                <Select.List>
-                  {PRESETS.map((p) => (
-                    <Select.Item
-                      key={p.value}
-                      value={`preset:${p.value}`}
-                      className="flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm text-foreground outline-none data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground"
-                    >
-                      <Select.ItemText>{p.label}</Select.ItemText>
-                      <Select.ItemIndicator>
-                        <Check className="size-4 text-brand" />
-                      </Select.ItemIndicator>
-                    </Select.Item>
-                  ))}
-                  {customKey && (
-                    <Select.Item
-                      value="custom"
-                      className="flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm text-foreground outline-none data-[highlighted]:bg-accent data-[highlighted]:text-accent-foreground"
-                    >
-                      <Select.ItemText>Saját háttér</Select.ItemText>
-                      <Select.ItemIndicator>
-                        <Check className="size-4 text-brand" />
-                      </Select.ItemIndicator>
-                    </Select.Item>
-                  )}
-                </Select.List>
-              </Select.Popup>
-            </Select.Positioner>
-          </Select.Portal>
-        </Select.Root>
+      <div className="grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-7">
+        {SHOWROOM_PRESETS.map((p) => {
+          const selected =
+            currentBgType === "SHOWROOM" && p.key === currentPresetKey;
+          const loading = busyKey === `preset:${p.key}`;
+          return (
+            <BgTile
+              key={p.key}
+              label={p.label}
+              imageUrl={showroomPublicPath(p.key)}
+              selected={selected}
+              loading={loading}
+              disabled={busy && !loading}
+              onClick={() => void applyShowroom(p.key)}
+            />
+          );
+        })}
 
-        <button
-          type="button"
+        {savedCustomKey && savedCustomUrl && (
+          <BgTile
+            label="Saját háttér"
+            imageUrl={savedCustomUrl}
+            selected={currentBgType === "CUSTOM"}
+            loading={busyKey === `custom:${savedCustomKey}`}
+            disabled={busy && busyKey !== `custom:${savedCustomKey}`}
+            onClick={() => void applyCustom(savedCustomKey)}
+          />
+        )}
+
+        <UploadTile
+          loading={busyKey === "upload"}
+          disabled={busy && busyKey !== "upload"}
           onClick={() => fileInputRef.current?.click()}
-          disabled={busy}
-          className={cn(
-            "inline-flex h-10 items-center justify-center gap-1.5 rounded-full border border-border bg-white px-4 text-sm font-medium text-foreground",
-            "hover:bg-secondary disabled:pointer-events-none disabled:opacity-60",
-          )}
-        >
-          <ImagePlus className="size-4" />
-          Saját kép feltöltése
-        </button>
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          className="hidden"
-          onChange={(e) => {
-            const f = e.target.files?.[0];
-            if (f) void handleUpload(f);
-            e.target.value = "";
-          }}
         />
       </div>
 
-      {error && (
-        <p className="mt-3 text-sm text-rose-600">{error}</p>
-      )}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        className="hidden"
+        onChange={(e) => {
+          const f = e.target.files?.[0];
+          if (f) void handleUpload(f);
+          e.target.value = "";
+        }}
+      />
+
+      {error && <p className="mt-3 text-sm text-rose-600">{error}</p>}
     </section>
+  );
+}
+
+function BgTile({
+  label,
+  imageUrl,
+  selected,
+  loading,
+  disabled,
+  onClick,
+}: {
+  label: string;
+  imageUrl: string;
+  selected: boolean;
+  loading: boolean;
+  disabled: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      aria-label={label}
+      aria-pressed={selected}
+      className={cn(
+        "group relative aspect-[4/3] overflow-hidden rounded-xl border bg-secondary transition-all",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40",
+        selected
+          ? "border-brand ring-2 ring-brand"
+          : "border-border/70 hover:border-foreground/40",
+        disabled && "pointer-events-none opacity-50",
+      )}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src={imageUrl}
+        alt=""
+        className="absolute inset-0 size-full object-cover transition-transform group-hover:scale-[1.03]"
+      />
+      {selected && (
+        <span className="absolute right-1.5 top-1.5 flex size-6 items-center justify-center rounded-full bg-brand text-white shadow-sm">
+          <Check className="size-3.5" strokeWidth={3} />
+        </span>
+      )}
+      {loading && (
+        <span className="absolute inset-0 flex items-center justify-center bg-white/70">
+          <Loader2 className="size-5 animate-spin text-brand" />
+        </span>
+      )}
+    </button>
+  );
+}
+
+function UploadTile({
+  loading,
+  disabled,
+  onClick,
+}: {
+  loading: boolean;
+  disabled: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      aria-label="Saját háttér feltöltése"
+      className={cn(
+        "group relative aspect-[4/3] overflow-hidden rounded-xl border-2 border-dashed bg-white text-muted-foreground transition-all",
+        "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40",
+        "hover:border-brand hover:text-brand",
+        disabled && "pointer-events-none opacity-50",
+      )}
+    >
+      <span className="absolute inset-0 flex flex-col items-center justify-center gap-1.5 text-xs font-medium">
+        {loading ? (
+          <Loader2 className="size-5 animate-spin text-brand" />
+        ) : (
+          <>
+            <ImagePlus className="size-5" />
+            Saját kép
+          </>
+        )}
+      </span>
+    </button>
   );
 }
