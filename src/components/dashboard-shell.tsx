@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { UserButton } from "@clerk/nextjs";
-import { Car, Coins, Home, Images, Menu, Plus, X } from "lucide-react";
+import { Car, Coins, Home, Images, Menu, Plus, ShieldCheck, X } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -12,6 +12,7 @@ type Props = {
   subscriptionCredits: number;
   topupCredits: number;
   email: string;
+  isAdmin: boolean;
   children: React.ReactNode;
 };
 
@@ -21,8 +22,16 @@ const NAV_ITEMS = [
   { href: "/dashboard/billing", label: "Számlázás", icon: Coins, match: "prefix" as const },
 ];
 
-export function DashboardShell({ subscriptionCredits, topupCredits, email, children }: Props) {
+const ADMIN_NAV_ITEM = {
+  href: "/admin/support",
+  label: "Support inbox",
+  icon: ShieldCheck,
+  match: "prefix" as const,
+};
+
+export function DashboardShell({ subscriptionCredits, topupCredits, email, isAdmin, children }: Props) {
   const totalCredits = subscriptionCredits + topupCredits;
+  const navItems = isAdmin ? [...NAV_ITEMS, ADMIN_NAV_ITEM] : NAV_ITEMS;
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
 
@@ -59,7 +68,7 @@ export function DashboardShell({ subscriptionCredits, topupCredits, email, child
 
       {/* Nav */}
       <nav className="flex-1 space-y-1 px-3 pt-2">
-        {NAV_ITEMS.map((item) => {
+        {navItems.map((item) => {
           const active = isActive(item.href, item.match);
           return (
             <Link

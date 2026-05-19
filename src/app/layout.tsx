@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
 import { huHU } from "@clerk/localizations";
 import { Inter, Space_Grotesk, JetBrains_Mono } from "next/font/google";
+import { SupportChat } from "@/components/support-chat";
 import "./globals.css";
 
 const inter = Inter({
@@ -38,7 +39,10 @@ export default function RootLayout({
         lang="hu"
         className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} h-full antialiased`}
       >
-        <body className="min-h-full flex flex-col font-sans">{children}</body>
+        <body className="min-h-full flex flex-col font-sans">
+          {children}
+          <SupportChat />
+        </body>
       </html>
     </ClerkProvider>
   );
