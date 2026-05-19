@@ -9,7 +9,8 @@ import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 type Props = {
-  creditsLeft: number;
+  subscriptionCredits: number;
+  topupCredits: number;
   email: string;
   children: React.ReactNode;
 };
@@ -17,9 +18,11 @@ type Props = {
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Kezdőlap", icon: Home, match: "exact" as const },
   { href: "/dashboard/galeria", label: "Galéria", icon: Images, match: "prefix" as const },
+  { href: "/dashboard/billing", label: "Számlázás", icon: Coins, match: "prefix" as const },
 ];
 
-export function DashboardShell({ creditsLeft, email, children }: Props) {
+export function DashboardShell({ subscriptionCredits, topupCredits, email, children }: Props) {
+  const totalCredits = subscriptionCredits + topupCredits;
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
 
@@ -82,9 +85,25 @@ export function DashboardShell({ creditsLeft, email, children }: Props) {
         <div className="mb-3 flex items-center justify-between rounded-xl bg-accent/60 px-3.5 py-2.5">
           <div className="flex items-center gap-2 text-sm">
             <Coins className="size-4 text-brand" />
-            <span className="font-medium text-foreground">{creditsLeft}</span>
-            <span className="text-muted-foreground">/ 3 kredit</span>
+            <span className="font-medium text-foreground">{totalCredits}</span>
+            <span className="text-muted-foreground">
+              kredit
+              {topupCredits > 0 && (
+                <span className="ml-1 text-[11px]">
+                  ({subscriptionCredits}+{topupCredits})
+                </span>
+              )}
+            </span>
           </div>
+          {totalCredits === 0 && (
+            <Link
+              href="/pricing"
+              onClick={() => setMobileOpen(false)}
+              className="rounded-md bg-brand px-2 py-0.5 text-[11px] font-medium text-white hover:bg-brand/90"
+            >
+              Tölts fel
+            </Link>
+          )}
         </div>
         <div className="flex items-center gap-3 rounded-xl px-1 py-1">
           <UserButton
@@ -114,7 +133,7 @@ export function DashboardShell({ creditsLeft, email, children }: Props) {
         <div className="flex items-center gap-2">
           <span className="inline-flex items-center gap-1 rounded-full bg-accent px-2.5 py-1 text-xs font-medium text-accent-foreground">
             <Coins className="size-3" />
-            {creditsLeft}/3
+            {totalCredits} kredit
           </span>
           <button
             type="button"

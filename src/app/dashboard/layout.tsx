@@ -11,7 +11,11 @@ export default async function DashboardLayout({
   const user = await getOrCreateUser();
 
   return (
-    <DashboardShell creditsLeft={user.creditsLeft} email={user.email}>
+    <DashboardShell
+      subscriptionCredits={user.subscriptionCredits}
+      topupCredits={user.topupCredits}
+      email={user.email}
+    >
       {children}
     </DashboardShell>
   );

@@ -50,9 +50,9 @@ function SiteNav() {
           <a href="#hogyan" className="transition-colors hover:text-foreground">
             Hogyan működik
           </a>
-          <a href="#arak" className="transition-colors hover:text-foreground">
+          <Link href="/pricing" className="transition-colors hover:text-foreground">
             Árak
-          </a>
+          </Link>
         </nav>
         <div className="flex items-center gap-2">
           <Link

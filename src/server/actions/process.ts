@@ -28,8 +28,8 @@ export async function processImage(
 ): Promise<{ projectId: string }> {
   const user = await getOrCreateUser();
   const unlimited = hasUnlimitedCredits(user.email);
-  if (!unlimited && user.creditsLeft <= 0) {
-    throw new Error("Elfogytak a krediteid.");
+  if (!unlimited && user.subscriptionCredits <= 0 && user.topupCredits <= 0) {
+    throw new Error("NO_CREDITS");
   }
 
   const initialBgType = user.preferredBg ?? "SHOWROOM";
@@ -88,6 +88,12 @@ export async function processImage(
         data: { status: "DONE", processedKey, cutoutKey },
       });
     } else {
+      // Priority: subscription credits first, top-up second.
+      const creditUpdate =
+        user.subscriptionCredits > 0
+          ? { subscriptionCredits: { decrement: 1 } }
+          : { topupCredits: { decrement: 1 } };
+
       await prisma.$transaction([
         prisma.image.update({
           where: { id: image.id },
@@ -95,7 +101,7 @@ export async function processImage(
         }),
         prisma.user.update({
           where: { id: user.id },
-          data: { creditsLeft: { decrement: 1 } },
+          data: creditUpdate,
         }),
       ]);
     }

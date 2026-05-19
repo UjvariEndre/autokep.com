@@ -71,6 +71,10 @@ export default function NewProjectPage() {
       router.push(`/dashboard/projects/${projectId}`);
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
+      if (msg === "NO_CREDITS") {
+        router.push("/pricing");
+        return;
+      }
       setError(msg);
       setIsProcessing(false);
     }

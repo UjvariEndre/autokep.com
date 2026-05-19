@@ -15,14 +15,46 @@ model User {
   clerkId        String          @unique
   email          String          @unique
   plan           Plan            @default(FREE)
-  creditsLeft    Int             @default(3)
-  creditsReset   DateTime        @default(now())
+
+  // Credits
+  subscriptionCredits Int       @default(3) // trial = 3; sub renewal resets to 50; expires at period end
+  topupCredits        Int       @default(0) // never expires
+  creditsReset        DateTime? // null until subscribed; then = next reset date
+
+  // Stripe linkage
+  stripeCustomerId      String?   @unique
+  stripeSubscriptionId  String?   @unique
+  subscriptionStatus    String?   // active, past_due, canceled, incomplete, ...
+  subscriptionPeriodEnd DateTime? // current_period_end from Stripe
+
   preferredBg          BackgroundType? @map("preferred_bg")
   preferredBgKey       String?         @map("preferred_bg_key")
   preferredBgPresetKey String?         @map("preferred_bg_preset_key")
-  projects       Project[]
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
+
+  projects  Project[]
+  payments  Payment[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Payment {
+  id                      String   @id @default(cuid())
+  userId                  String
+  user                    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stripeCheckoutSessionId String?  @unique
+  stripeInvoiceId         String?  @unique
+  type                    String   // "subscription" | "topup"
+  amountHuf               Int
+  creditsAdded            Int
+  createdAt               DateTime @default(now())
+
+  @@index([userId])
+}
+
+model WebhookEvent {
+  id          String   @id // Stripe event.id (idempotency key)
+  type        String
+  processedAt DateTime @default(now())
 }
 
 model Project {

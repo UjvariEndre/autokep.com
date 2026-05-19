@@ -3,8 +3,6 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/prisma";
 import type { UserModel } from "@/generated/prisma/models";
 
-const TRIAL_DAYS = 30;
-
 export class UnauthenticatedError extends Error {
   constructor() {
     super("Nincs bejelentkezve.");
@@ -31,13 +29,12 @@ export async function getOrCreateUser(): Promise<UserModel> {
     throw new Error("A Clerk user-nek nincs email címe.");
   }
 
-  const resetAt = new Date(Date.now() + TRIAL_DAYS * 24 * 60 * 60 * 1000);
-
+  // Trial credits (subscriptionCredits = 3 default) don't reset — creditsReset
+  // is set later by the subscription invoice webhook to current_period_end.
   return prisma.user.create({
     data: {
       clerkId: userId,
       email,
-      creditsReset: resetAt,
     },
   });
 }
