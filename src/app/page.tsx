@@ -4,10 +4,7 @@ import { auth } from "@clerk/nextjs/server";
 import {
   ArrowRight,
   Car,
-  Download,
-  ImageIcon,
   Sparkles,
-  Upload,
   Wand2,
   Zap,
 } from "lucide-react";
@@ -130,7 +127,12 @@ function BeforeAfter() {
         </div>
 
         <div className="relative grid items-center gap-6 md:grid-cols-[1fr_auto_1fr]">
-          <DemoCard label="Eredeti fotó" sublabel="Parkoló, utca, gyenge fény" tone="before" />
+          <DemoCard
+            label="Eredeti fotó"
+            sublabel="Parkoló, utca, gyenge fény"
+            tone="before"
+            imageSrc="/images/landing/before.jpg"
+          />
           <div className="hidden md:flex">
             <div className="flex size-12 items-center justify-center rounded-full bg-brand text-white shadow-soft-lg">
               <ArrowRight className="size-5" />
@@ -141,7 +143,12 @@ function BeforeAfter() {
               <ArrowRight className="size-4 rotate-90" />
             </div>
           </div>
-          <DemoCard label="Eredmény" sublabel="Showroom háttérrel, AI-vágva" tone="after" />
+          <DemoCard
+            label="Eredmény"
+            sublabel="Showroom háttérrel, AI-vágva"
+            tone="after"
+            imageSrc="/images/landing/after.jpg"
+          />
         </div>
       </div>
     </section>
@@ -151,49 +158,33 @@ function BeforeAfter() {
 function DemoCard({
   label,
   sublabel,
+  imageSrc,
   tone,
 }: {
   label: string;
   sublabel: string;
+  imageSrc: string;
   tone: "before" | "after";
 }) {
   const isAfter = tone === "after";
   return (
     <div className="flex flex-col gap-3">
-      <div
-        className={cn(
-          "relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-border/70 shadow-soft",
-          isAfter
-            ? "bg-gradient-to-br from-slate-100 via-indigo-50 to-violet-100"
-            : "bg-gradient-to-br from-zinc-100 to-zinc-200",
-        )}
-      >
-        {/* "floor" line for the after card to suggest showroom */}
-        {isAfter && (
-          <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-b from-transparent to-white/40" />
-        )}
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
-          <div
-            className={cn(
-              "flex size-16 items-center justify-center rounded-2xl",
-              isAfter
-                ? "bg-white/80 text-brand shadow-soft backdrop-blur"
-                : "bg-white/70 text-muted-foreground",
-            )}
-          >
-            {isAfter ? <Car className="size-7" /> : <ImageIcon className="size-7" />}
-          </div>
-          <span
-            className={cn(
-              "rounded-full px-3 py-1 text-xs font-medium",
-              isAfter
-                ? "bg-white/80 text-foreground shadow-soft backdrop-blur"
-                : "bg-white/70 text-muted-foreground",
-            )}
-          >
-            {isAfter ? "AI showroom" : "Eredeti"}
-          </span>
-        </div>
+      <div className="relative aspect-[4/3] w-full overflow-hidden rounded-3xl border border-border/70 bg-zinc-100 shadow-soft">
+        <img
+          src={imageSrc}
+          alt={label}
+          className="absolute inset-0 size-full object-cover"
+        />
+        <span
+          className={cn(
+            "absolute left-3 top-3 rounded-full px-3 py-1 text-xs font-medium backdrop-blur",
+            isAfter
+              ? "bg-white/85 text-foreground shadow-soft"
+              : "bg-black/55 text-white",
+          )}
+        >
+          {isAfter ? "AI showroom" : "Eredeti"}
+        </span>
       </div>
       <div className="px-1">
         <p className="text-sm font-medium text-foreground">{label}</p>
@@ -262,19 +253,120 @@ function Features() {
   );
 }
 
+function StepUploadArt() {
+  return (
+    <svg viewBox="0 0 64 64" className="size-16" aria-hidden>
+      <defs>
+        <linearGradient id="stepBrand1" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#2563eb" />
+          <stop offset="100%" stopColor="#7c3aed" />
+        </linearGradient>
+      </defs>
+      <path
+        d="M22 24 Q19 24 18.5 27 Q15 27 15 30.5 Q15 34 18.5 34 H38 Q42 34 42 30 Q42 26 38 26 Q37.5 22.5 34 22.5 Q32 19.5 28 20.5 Q24 20 22 24 Z"
+        fill="url(#stepBrand1)"
+        fillOpacity="0.14"
+        stroke="url(#stepBrand1)"
+        strokeWidth="1.5"
+      />
+      <path
+        d="M28.5 32 V24 M28.5 24 L25 27.5 M28.5 24 L32 27.5"
+        stroke="url(#stepBrand1)"
+        strokeWidth="2.4"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      />
+      <path d="M10 50 L14 42 H38 L46 48 H52 V53 H10 Z" fill="#cbd5e1" />
+      <circle cx="20" cy="53" r="3.2" fill="#1f2937" />
+      <circle cx="44" cy="53" r="3.2" fill="#1f2937" />
+    </svg>
+  );
+}
+
+function StepMagicArt() {
+  return (
+    <svg viewBox="0 0 64 64" className="size-16" aria-hidden>
+      <defs>
+        <linearGradient id="stepBrand2" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#2563eb" />
+          <stop offset="100%" stopColor="#7c3aed" />
+        </linearGradient>
+      </defs>
+      <path d="M12 40 L16 32 H40 L48 38 H54 V43 H12 Z" fill="#cbd5e1" />
+      <circle cx="22" cy="43" r="3.2" fill="#1f2937" />
+      <circle cx="46" cy="43" r="3.2" fill="#1f2937" />
+      <path
+        d="M14 10 L16 15 L21 17 L16 19 L14 24 L12 19 L7 17 L12 15 Z"
+        fill="url(#stepBrand2)"
+      />
+      <path
+        d="M52 14 L53.5 17.5 L57 19 L53.5 20.5 L52 24 L50.5 20.5 L47 19 L50.5 17.5 Z"
+        fill="url(#stepBrand2)"
+        fillOpacity="0.75"
+      />
+      <path
+        d="M54 50 L55 52.5 L57.5 53.5 L55 54.5 L54 57 L53 54.5 L50.5 53.5 L53 52.5 Z"
+        fill="url(#stepBrand2)"
+        fillOpacity="0.55"
+      />
+      <path
+        d="M9 52 L10 54 L12 54.8 L10 55.6 L9 57.6 L8 55.6 L6 54.8 L8 54 Z"
+        fill="url(#stepBrand2)"
+        fillOpacity="0.45"
+      />
+    </svg>
+  );
+}
+
+function StepDownloadArt() {
+  return (
+    <svg viewBox="0 0 64 64" className="size-16" aria-hidden>
+      <defs>
+        <linearGradient id="stepBrand3" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#2563eb" />
+          <stop offset="100%" stopColor="#7c3aed" />
+        </linearGradient>
+      </defs>
+      <rect
+        x="9"
+        y="9"
+        width="46"
+        height="32"
+        rx="5"
+        fill="url(#stepBrand3)"
+        fillOpacity="0.1"
+        stroke="url(#stepBrand3)"
+        strokeWidth="1.8"
+      />
+      <path d="M17 32 L21 25 H37 L43 30 H47 V35 H17 Z" fill="#cbd5e1" />
+      <circle cx="24" cy="35" r="2.4" fill="#1f2937" />
+      <circle cx="42" cy="35" r="2.4" fill="#1f2937" />
+      <path
+        d="M32 46 V58 M32 58 L26.5 52.5 M32 58 L37.5 52.5"
+        stroke="url(#stepBrand3)"
+        strokeWidth="2.6"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
+      />
+    </svg>
+  );
+}
+
 const STEPS = [
   {
-    icon: Upload,
+    Art: StepUploadArt,
     title: "Tölts fel egy fotót",
     body: "Drag & drop, vagy tallózás. JPG, PNG, WebP, 12 MB-ig.",
   },
   {
-    icon: Wand2,
+    Art: StepMagicArt,
     title: "AI cseréli a hátteret",
     body: "2-5 másodperc alatt elkészül — kivágás + showroom háttér rárakása.",
   },
   {
-    icon: Download,
+    Art: StepDownloadArt,
     title: "Töltsd le, használd",
     body: "JPG-ben letölthető, hirdetésre, OLX-re, használtautóra azonnal kész.",
   },
@@ -303,7 +395,7 @@ function HowItWorks() {
             <div key={s.title} className="relative flex flex-col items-center text-center">
               <div className="relative mb-5">
                 <div className="flex size-22 items-center justify-center rounded-3xl border border-border/70 bg-white shadow-soft">
-                  <s.icon className="size-7 text-brand" />
+                  <s.Art />
                 </div>
                 <span className="absolute -right-2 -top-2 flex size-7 items-center justify-center rounded-full bg-brand text-xs font-semibold text-white shadow-soft">
                   {i + 1}
