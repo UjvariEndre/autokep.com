@@ -2,8 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { prisma } from "@/lib/prisma";
-import { getPresignedDownloadUrl } from "@/lib/r2";
+import { getPresignedDownloadUrl, objectExists } from "@/lib/r2";
 import {
+  customBgThumbKey,
   DEFAULT_SHOWROOM_KEY,
   isShowroomKey,
   showroomPublicPath,
@@ -63,8 +64,15 @@ export default async function ProjectPage({
     project.backgroundType === "CUSTOM" && project.backgroundUrl
       ? project.backgroundUrl
       : user.preferredBgKey;
+  // Prefer the lightweight thumbnail for the picker tile; fall back to the
+  // full-res key for backgrounds uploaded before thumbnails were generated.
   const savedCustomUrl = savedCustomKey
-    ? await getPresignedDownloadUrl(savedCustomKey, 3600)
+    ? await getPresignedDownloadUrl(
+        (await objectExists(customBgThumbKey(savedCustomKey)))
+          ? customBgThumbKey(savedCustomKey)
+          : savedCustomKey,
+        3600,
+      )
     : null;
 
   const resolvedPresetKey = isShowroomKey(project.backgroundPresetKey)

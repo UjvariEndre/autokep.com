@@ -8,7 +8,7 @@ import {
   changeBackground,
   getCustomBackgroundUploadUrl,
 } from "@/server/actions/background";
-import { SHOWROOM_PRESETS, showroomPublicPath } from "@/lib/backgrounds";
+import { SHOWROOM_PRESETS, showroomThumbPath } from "@/lib/backgrounds";
 import { useI18n } from "@/i18n/provider";
 import type { BackgroundType } from "@/generated/prisma/enums";
 
@@ -127,7 +127,7 @@ export function BackgroundPicker({
             <BgTile
               key={p.key}
               label={p.label}
-              imageUrl={showroomPublicPath(p.key)}
+              imageUrl={showroomThumbPath(p.key)}
               selected={selected}
               loading={loading}
               disabled={busy && !loading}

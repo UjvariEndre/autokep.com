@@ -2,6 +2,7 @@
 
 import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
+import sharp from "sharp";
 import { prisma } from "@/lib/prisma";
 import {
   downloadObject,
@@ -10,9 +11,27 @@ import {
 } from "@/lib/r2";
 import { composeOnBackground } from "@/lib/composite";
 import {
+  customBgThumbKey,
   DEFAULT_SHOWROOM_KEY,
   isShowroomKey,
 } from "@/lib/backgrounds";
+
+// Width of the custom-background thumbnail shown in the BackgroundPicker grid.
+// Matches scripts/gen-thumbs.ts so showroom and custom tiles look consistent.
+const CUSTOM_BG_THUMB_WIDTH = 320;
+
+/**
+ * Generate and store a small WebP thumbnail for a custom background so the
+ * picker grid doesn't load the multi-MB original. Best-effort: a failure here
+ * must never break the actual background change, so callers ignore errors.
+ */
+async function storeCustomBgThumb(key: string, fullBg: Buffer): Promise<void> {
+  const thumb = await sharp(fullBg)
+    .resize({ width: CUSTOM_BG_THUMB_WIDTH, withoutEnlargement: true })
+    .webp({ quality: 72 })
+    .toBuffer();
+  await uploadBuffer(customBgThumbKey(key), thumb, "image/webp");
+}
 import { getOrCreateUser } from "@/server/users";
 import type { BackgroundType } from "@/generated/prisma/enums";
 
@@ -102,6 +121,15 @@ export async function changeBackground(
   });
 
   await uploadBuffer(image.processedKey, composed, "image/jpeg");
+
+  // Best-effort picker thumbnail for the custom bg — never block the apply.
+  if (resolvedCustomKey && customBg) {
+    try {
+      await storeCustomBgThumb(resolvedCustomKey, customBg);
+    } catch (err) {
+      console.error("Custom bg thumbnail generation failed:", err);
+    }
+  }
 
   await prisma.$transaction([
     prisma.project.update({
