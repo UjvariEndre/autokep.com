@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { format, isToday } from "date-fns";
-import { hu } from "date-fns/locale";
+import { hu, enUS } from "date-fns/locale";
 import { ArrowLeft, Coins, Lock, Unlock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { prisma } from "@/lib/prisma";
 import { cn } from "@/lib/utils";
+import { getI18n } from "@/i18n/locale";
+import type { Locale } from "@/i18n/config";
 import {
   adminCloseThread,
   adminMarkThreadRead,
@@ -16,9 +18,15 @@ import { ReplyForm } from "./reply-form";
 
 export const dynamic = "force-dynamic";
 
-function formatTime(d: Date): string {
+function fmt(template: string, vars: Record<string, string | number>): string {
+  return template.replace(/\{(\w+)\}/g, (_, k) => String(vars[k] ?? ""));
+}
+
+function formatTime(d: Date, locale: Locale): string {
   if (isToday(d)) return format(d, "HH:mm");
-  return format(d, "yyyy. MMM d. HH:mm", { locale: hu });
+  return format(d, locale === "hu" ? "yyyy. MMM d. HH:mm" : "MMM d, yyyy HH:mm", {
+    locale: locale === "hu" ? hu : enUS,
+  });
 }
 
 export default async function AdminThreadPage({
@@ -27,6 +35,8 @@ export default async function AdminThreadPage({
   params: Promise<{ threadId: string }>;
 }) {
   const { threadId } = await params;
+  const { locale, dict } = await getI18n();
+  const t = dict.admin;
   const thread = await prisma.supportThread.findUnique({
     where: { id: threadId },
     include: {
@@ -61,7 +71,7 @@ export default async function AdminThreadPage({
         className="mb-5 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
       >
         <ArrowLeft className="size-4" />
-        Beszélgetések
+        {t.threadsLink}
       </Link>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
@@ -72,7 +82,7 @@ export default async function AdminThreadPage({
             <div className="min-w-0">
               <p className="truncate text-base font-semibold">{thread.user.email}</p>
               <p className="text-xs text-white/85">
-                {thread.messages.length} üzenet · {formatTime(thread.lastMessageAt)}
+                {fmt(t.messageCount, { count: thread.messages.length })} · {formatTime(thread.lastMessageAt, locale)}
               </p>
             </div>
             <form action={closeAction}>
@@ -83,12 +93,12 @@ export default async function AdminThreadPage({
                 {isClosed ? (
                   <>
                     <Unlock className="size-3.5" />
-                    Újranyitás
+                    {t.reopen}
                   </>
                 ) : (
                   <>
                     <Lock className="size-3.5" />
-                    Lezárás
+                    {t.close}
                   </>
                 )}
               </button>
@@ -121,7 +131,7 @@ export default async function AdminThreadPage({
                       {m.body}
                     </div>
                     <span className="px-1 text-[10px] text-muted-foreground">
-                      {isUser ? "Ügyfél" : "Te"} · {formatTime(m.createdAt)}
+                      {isUser ? t.msgCustomer : t.msgYou} · {formatTime(m.createdAt, locale)}
                     </span>
                   </div>
                 </div>
@@ -136,24 +146,24 @@ export default async function AdminThreadPage({
         <aside className="space-y-4">
           <div className="rounded-2xl border border-border/70 bg-white p-5 shadow-soft">
             <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              Ügyfél
+              {t.customer}
             </p>
             <p className="mt-2 truncate text-sm font-medium text-foreground">
               {thread.user.email}
             </p>
             <div className="mt-4 space-y-2">
               <Row
-                label="Előfizetés"
-                value={thread.user.subscriptionStatus ?? "nincs"}
+                label={t.subscriptionRow}
+                value={thread.user.subscriptionStatus ?? t.noSubscription}
               />
-              <Row label="Sub kredit" value={`${thread.user.subscriptionCredits}`} icon={Coins} />
-              <Row label="Top-up kredit" value={`${thread.user.topupCredits}`} icon={Coins} />
+              <Row label={t.subCredit} value={`${thread.user.subscriptionCredits}`} icon={Coins} />
+              <Row label={t.topupCredit} value={`${thread.user.topupCredits}`} icon={Coins} />
             </div>
           </div>
 
           <div className="rounded-2xl border border-border/70 bg-white p-5 shadow-soft">
             <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              Beszélgetés
+              {t.thread}
             </p>
             <div className="mt-3 flex items-center gap-2">
               <Badge
@@ -163,11 +173,11 @@ export default async function AdminThreadPage({
                     : "bg-emerald-100 text-emerald-700"
                 }
               >
-                {isClosed ? "Lezárva" : "Nyitva"}
+                {isClosed ? t.closed : t.open}
               </Badge>
             </div>
             <p className="mt-3 text-xs text-muted-foreground">
-              Kezdődött: {formatTime(thread.createdAt)}
+              {fmt(t.startedAt, { date: formatTime(thread.createdAt, locale) })}
             </p>
           </div>
         </aside>

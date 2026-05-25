@@ -1,0 +1,331 @@
+{
+  "common": {
+    "login": "Sign in",
+    "signup": "Try it",
+    "tryFree": "Try it free",
+    "getStartedFree": "Get started free",
+    "dashboard": "Dashboard",
+    "buy": "Buy",
+    "credit": "credits"
+  },
+  "shell": {
+    "newImage": "New image",
+    "topUp": "Top up",
+    "loggedIn": "Signed in",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "nav": {
+      "home": "Home",
+      "gallery": "Gallery",
+      "billing": "Billing",
+      "settings": "Settings",
+      "supportInbox": "Support inbox"
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Your account and app preferences.",
+    "languageLabel": "Language",
+    "languageHelp": "Choose the app language. The preference is saved to your account, so it stays consistent across devices.",
+    "hungarian": "Hungarian",
+    "english": "English",
+    "saved": "Saved"
+  },
+  "landing": {
+    "nav": {
+      "features": "Features",
+      "howItWorks": "How it works",
+      "pricing": "Pricing"
+    },
+    "hero": {
+      "badge": "AI background replacement for car photos",
+      "titlePrefix": "Studio-quality car photos in ",
+      "titleHighlight": "seconds",
+      "titleSuffix": "",
+      "subtitle": "Upload your photo, the AI cuts out the background, and we drop in our professional showroom backdrop. For dealers and individuals alike.",
+      "fineprint": "3 free images per month · No credit card required · JPG, PNG, WebP"
+    },
+    "beforeAfter": {
+      "eyebrow": "Live example",
+      "title": "One photo. Two seconds. Studio background.",
+      "originalLabel": "Original photo",
+      "originalSublabel": "Parking lot, street, poor light",
+      "resultLabel": "Result",
+      "resultSublabel": "With showroom background, AI-cut",
+      "badgeAfter": "AI showroom",
+      "badgeBefore": "Original"
+    },
+    "features": {
+      "eyebrow": "Why Autókép?",
+      "title": "Clean, fast, car-specific.",
+      "intro": "Generic background removers often ruin mirrors or wheels. We use a model built specifically for cars.",
+      "items": [
+        {
+          "title": "In seconds",
+          "body": "Processing takes 2-5 seconds. No waiting, no queues — you get the finished image instantly."
+        },
+        {
+          "title": "AI tuned for cars",
+          "body": "We use the remove.bg type=car model. It cuts precisely around mirrors, antennas and wheels."
+        },
+        {
+          "title": "Built for dealers",
+          "body": "Designed for car dealers, with friendly support. No complicated setup required."
+        }
+      ]
+    },
+    "howItWorks": {
+      "eyebrow": "How it works",
+      "title": "Three steps. Zero hassle.",
+      "steps": [
+        {
+          "title": "Upload a photo",
+          "body": "Drag & drop, or browse. JPG, PNG, WebP, up to 12 MB."
+        },
+        {
+          "title": "AI replaces the background",
+          "body": "Ready in 2-5 seconds — cutout + showroom background applied."
+        },
+        {
+          "title": "Download and use",
+          "body": "Download as JPG, ready instantly for listings, marketplaces and used-car ads."
+        }
+      ]
+    },
+    "finalCta": {
+      "title": "Ready to make your listings look better?",
+      "subtitle": "3 free images per month. Try it now, sign up in 30 seconds."
+    },
+    "footer": {
+      "privacy": "Privacy",
+      "terms": "Terms"
+    }
+  },
+  "pricing": {
+    "nav": {
+      "home": "Home",
+      "pricing": "Pricing"
+    },
+    "canceled": "Purchase canceled. You can come back any time you're ready.",
+    "badge": "Simple, transparent pricing",
+    "titlePrefix": "Simple pricing, ",
+    "titleHighlight": "pro photos",
+    "titleSuffix": "",
+    "subtitle": "A monthly subscription for regular work, or one-time top-up credits when you only need it occasionally.",
+    "mostPopular": "Most popular",
+    "subscription": "Subscription",
+    "subscriptionTagline": "For active dealers who regularly create new listings.",
+    "subscriptionFeatures": [
+      "50 images every month",
+      "Showroom studio backgrounds",
+      "Custom background upload",
+      "One-click download",
+      "Cancel any time"
+    ],
+    "perMonth": "Ft / mo",
+    "renewNote": "Renews monthly · 50 images / month",
+    "subscribe": "Subscribe",
+    "cancelAnytime": "Cancel any time in your account",
+    "topupTitle": "Need more images? Buy extra credits",
+    "topupSubtitle": "One-time purchase, never expires. A perfect add-on to your subscription.",
+    "creditsLabel": "{credits} credits",
+    "perImageNeverExpires": "{price} Ft / image · Never expires",
+    "currency": "Ft",
+    "fineprint": "Prices are in Hungarian forint, VAT-exempt (small-business exemption). Cancel any time in your account. We are unable to offer refunds."
+  },
+  "dashboardHome": {
+    "badge": "AI background replacement for car photos",
+    "titleLine1": "Upload a photo,",
+    "titleLine2": "we'll handle the rest.",
+    "subtitle": "Drag your car photo here — we replace the background with AI in 2-5 seconds and give you a downloadable result.",
+    "dropTitle": "Drag your car photo here",
+    "or": "or",
+    "browse": "click to browse",
+    "fileHint": "JPG · PNG · WebP · max 12 MB",
+    "steps": [
+      { "label": "1. Upload", "text": "Drag & drop or browse" },
+      { "label": "2. AI replaces the background", "text": "in 2-5 seconds" },
+      { "label": "3. Download", "text": "Showroom-quality result" }
+    ]
+  },
+  "newProject": {
+    "back": "Back to home",
+    "title": "New image",
+    "subtitle": "Upload a car photo — the AI replaces the background in 2-5 seconds.",
+    "errorTitle": "Something went wrong",
+    "retry": "Try again",
+    "dropTitle": "Drag your car photo here",
+    "or": "or",
+    "browse": "click to browse",
+    "fileHint": "JPG · PNG · WebP · max 12 MB",
+    "previewAlt": "Preview",
+    "processing": "Replacing background",
+    "processingSuffix": "— 2-5 seconds...",
+    "chooseAnother": "Choose another",
+    "startProcessing": "Start processing",
+    "uploadFailed": "R2 upload failed (HTTP {status})."
+  },
+  "gallery": {
+    "title": "Gallery",
+    "subtitle": "All your processed car photos in one place.",
+    "newImage": "New image",
+    "emptyTitle": "Your gallery is empty",
+    "emptyBody": "Upload a car photo and get the finished showroom version in seconds.",
+    "startFirst": "Start your first one",
+    "deleteAria": "Delete image",
+    "status": {
+      "PENDING": "Pending",
+      "PROCESSING": "Processing",
+      "DONE": "Done",
+      "FAILED": "Failed"
+    }
+  },
+  "project": {
+    "back": "Back to gallery",
+    "noImage": "No image for this project.",
+    "edit": {
+      "title": "Edit",
+      "subtitle": "Adjust the rotation and position.",
+      "cancel": "Cancel",
+      "save": "Save",
+      "loadError": "Image load error: {src}",
+      "rotate": "Rotation",
+      "zoom": "Zoom",
+      "horizontal": "Horizontal (X)",
+      "vertical": "Vertical (Y)",
+      "reset": "Reset (0°, centered)",
+      "previewNote": "The preview is client-side — on save the server applies the same formula, so the result is pixel-perfect."
+    },
+    "view": {
+      "original": "Original",
+      "result": "Result",
+      "originalAlt": "Original image",
+      "processedAlt": "Processed image",
+      "noOriginal": "No original image",
+      "download": "Download",
+      "edit": "Edit",
+      "delete": "Delete",
+      "processingTitle": "Processing...",
+      "processingNote": "2-5 seconds, refreshes automatically",
+      "failedTitle": "Processing failed.",
+      "startNew": "Start a new image",
+      "noImage": "No image"
+    }
+  },
+  "backgroundPicker": {
+    "title": "Choose a background",
+    "customLabel": "Custom background",
+    "uploadAria": "Upload custom background",
+    "uploadLabel": "Your image",
+    "tooLarge": "The background image can be max 12 MB.",
+    "uploadFailed": "R2 upload failed (HTTP {status})."
+  },
+  "deleteDialog": {
+    "title": "Delete this image?",
+    "description": "This action cannot be undone. The image below will be permanently removed.",
+    "cancel": "Cancel",
+    "confirm": "Yes, delete"
+  },
+  "billing": {
+    "title": "Billing",
+    "subtitle": "An overview of your subscription and purchases.",
+    "successSubscriptionTitle": "Subscription successful!",
+    "successSubscriptionBody": "50 credits added to your account.",
+    "successTopupTitle": "Top-up purchase successful!",
+    "successTopupBody": "The credits are available in your account.",
+    "subscription": "Subscription",
+    "active": "Active",
+    "nextRenewal": "Next renewal: {date}",
+    "manageSubscription": "Manage subscription",
+    "canceled": "Canceled",
+    "usableUntil": "Usable until {date}",
+    "resubscribe": "Resubscribe",
+    "pastDue": "Payment failed",
+    "pastDueNote": "Update your card details to continue.",
+    "updatePayment": "Update payment method",
+    "noSubscriptionPrefix": "You haven't subscribed yet. ",
+    "freeCreditsPrefix": "You currently have ",
+    "freeCreditsAmount": "{count} free credits",
+    "freeCreditsSuffix": " available.",
+    "subscribeNow": "Subscribe",
+    "creditsTotal": "{count} credits",
+    "creditsBreakdown": "{sub} monthly · {topup} top-up",
+    "topupTitle": "Top-up credits",
+    "balance": "Balance: ",
+    "balanceCredits": "{count} credits",
+    "neverExpires": "Never expires.",
+    "buyCredit": "Buy credits",
+    "purchases": "Purchases",
+    "noPurchases": "No purchases yet.",
+    "colDate": "Date",
+    "colType": "Type",
+    "colAmount": "Amount",
+    "colCredit": "Credits",
+    "typeSubscription": "Subscription",
+    "typeTopup": "Top-up",
+    "noDate": "—"
+  },
+  "topup": {
+    "back": "Back to billing",
+    "title": "Buy top-up credits",
+    "subtitle": "One-time purchase, never expires. Pick a pack.",
+    "canceled": "Purchase canceled.",
+    "creditsLabel": "{credits} credits",
+    "recommended": "Recommended",
+    "perImage": "{price} Ft / image",
+    "currency": "Ft",
+    "perks": [
+      "Never expires",
+      "Use any time",
+      "Great alongside a subscription"
+    ],
+    "buy": "Buy",
+    "paymentNote": "Secure Stripe payment · Card, Apple Pay, Google Pay"
+  },
+  "support": {
+    "openAria": "Message us",
+    "closeAria": "Close chat",
+    "dialogAria": "Support chat",
+    "headerTitle": "We're here to help",
+    "headerSignedOut": "Sign in to chat.",
+    "headerSignedIn": "We usually reply within a few hours.",
+    "signInTitle": "Sign in to chat",
+    "signInBody": "So we can see your history and reply to you, chat is available only for signed-in users.",
+    "signIn": "Sign in",
+    "emptyTitle": "No messages yet",
+    "emptyBody": "Tell us how we can help. We usually reply within a few hours.",
+    "placeholder": "Type a message...",
+    "sendAria": "Send",
+    "you": "You",
+    "brand": "Autokep"
+  },
+  "admin": {
+    "back": "Dashboard",
+    "title": "Support conversations",
+    "summary": "{threads} conversations · {unread} unread",
+    "emptyTitle": "No conversations yet.",
+    "emptyBody": "When someone writes in the chat, it shows up here.",
+    "newBadge": "{count} new",
+    "closed": "Closed",
+    "open": "Open",
+    "youPrefix": "You: ",
+    "threadsLink": "Conversations",
+    "messageCount": "{count} messages",
+    "reopen": "Reopen",
+    "close": "Close",
+    "customer": "Customer",
+    "thread": "Conversation",
+    "subscriptionRow": "Subscription",
+    "noSubscription": "none",
+    "subCredit": "Sub credits",
+    "topupCredit": "Top-up credits",
+    "startedAt": "Started: {date}",
+    "replyPlaceholder": "Reply to the customer...",
+    "sendAria": "Send",
+    "replyNote1": "The customer also receives the reply by email.",
+    "replyTip": "Tip:",
+    "replyTipSuffix": "to send.",
+    "msgCustomer": "Customer",
+    "msgYou": "You"
+  }
+}

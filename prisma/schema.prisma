@@ -31,6 +31,9 @@ model User {
   preferredBgKey       String?         @map("preferred_bg_key")
   preferredBgPresetKey String?         @map("preferred_bg_preset_key")
 
+  // UI language preference; null = follow IP/cookie default. "hu" | "en"
+  locale               String?
+
   projects      Project[]
   payments      Payment[]
   supportThread SupportThread?

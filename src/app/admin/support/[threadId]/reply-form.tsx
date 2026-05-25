@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Loader2, Send } from "lucide-react";
 import { adminReply } from "@/server/actions/support";
+import { useI18n } from "@/i18n/provider";
 
 const MAX_MESSAGE = 2000;
 
@@ -10,6 +11,8 @@ export function ReplyForm({ threadId }: { threadId: string }) {
   const [body, setBody] = useState("");
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { dict } = useI18n();
+  const t = dict.admin;
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -42,7 +45,7 @@ export function ReplyForm({ threadId }: { threadId: string }) {
         <textarea
           rows={2}
           maxLength={MAX_MESSAGE}
-          placeholder="Válasz az ügyfélnek..."
+          placeholder={t.replyPlaceholder}
           value={body}
           onChange={(e) => setBody(e.target.value)}
           onKeyDown={(e) => {
@@ -57,7 +60,7 @@ export function ReplyForm({ threadId }: { threadId: string }) {
         <button
           type="submit"
           disabled={sending || !body.trim()}
-          aria-label="Küldés"
+          aria-label={t.sendAria}
           className="inline-flex h-[60px] w-12 shrink-0 items-center justify-center rounded-xl bg-brand text-white shadow-soft transition-colors hover:bg-brand/90 disabled:cursor-not-allowed disabled:opacity-50"
         >
           {sending ? (
@@ -68,8 +71,8 @@ export function ReplyForm({ threadId }: { threadId: string }) {
         </button>
       </div>
       <p className="mt-2 text-[11px] text-muted-foreground">
-        Az ügyfél emailben is megkapja a választ.
-        Tipp: <kbd className="rounded bg-secondary px-1.5 py-0.5 text-[10px]">Ctrl+Enter</kbd> küldéshez.
+        {t.replyNote1}{" "}
+        {t.replyTip} <kbd className="rounded bg-secondary px-1.5 py-0.5 text-[10px]">Ctrl+Enter</kbd> {t.replyTipSuffix}
       </p>
     </form>
   );

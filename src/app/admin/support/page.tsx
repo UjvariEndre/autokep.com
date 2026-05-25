@@ -1,15 +1,24 @@
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
-import { hu } from "date-fns/locale";
+import { hu, enUS } from "date-fns/locale";
 import { ChevronRight, Inbox, MessageCircle } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Card } from "@/components/ui/card";
 import { prisma } from "@/lib/prisma";
 import { cn } from "@/lib/utils";
+import { getI18n } from "@/i18n/locale";
 
 export const dynamic = "force-dynamic";
 
+function fmt(template: string, vars: Record<string, string | number>): string {
+  return template.replace(/\{(\w+)\}/g, (_, k) => String(vars[k] ?? ""));
+}
+
 export default async function AdminSupportPage() {
+  const { locale, dict } = await getI18n();
+  const t = dict.admin;
+  const dateLocale = locale === "hu" ? hu : enUS;
+
   const threads = await prisma.supportThread.findMany({
     orderBy: [
       { unreadByAdmin: "desc" },
@@ -33,10 +42,10 @@ export default async function AdminSupportPage() {
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-semibold tracking-tight md:text-3xl">
-            Support beszélgetések
+            {t.title}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            {threads.length} beszélgetés · {totalUnread} olvasatlan
+            {fmt(t.summary, { threads: threads.length, unread: totalUnread })}
           </p>
         </div>
       </div>
@@ -47,23 +56,23 @@ export default async function AdminSupportPage() {
             <Inbox className="size-5" />
           </div>
           <p className="text-sm font-medium text-foreground">
-            Még nincs egy beszélgetés sem.
+            {t.emptyTitle}
           </p>
           <p className="max-w-sm text-xs text-muted-foreground">
-            Ha valaki ír a chatben, itt jelenik meg.
+            {t.emptyBody}
           </p>
         </Card>
       ) : (
         <div className="space-y-2">
-          {threads.map((t) => {
-            const last = t.messages[0];
+          {threads.map((thread) => {
+            const last = thread.messages[0];
             const preview = last?.body ?? "";
-            const isClosed = t.status === "closed";
-            const hasUnread = t.unreadByAdmin > 0;
+            const isClosed = thread.status === "closed";
+            const hasUnread = thread.unreadByAdmin > 0;
             return (
               <Link
-                key={t.id}
-                href={`/admin/support/${t.id}`}
+                key={thread.id}
+                href={`/admin/support/${thread.id}`}
                 className={cn(
                   "group flex items-center justify-between gap-4 rounded-2xl border bg-white px-5 py-4 shadow-soft transition-all hover:-translate-y-0.5 hover:shadow-soft-lg",
                   hasUnread
@@ -85,22 +94,22 @@ export default async function AdminSupportPage() {
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center gap-2">
                       <p className="truncate text-sm font-medium text-foreground">
-                        {t.user.email}
+                        {thread.user.email}
                       </p>
                       {hasUnread && (
                         <Badge className="bg-brand text-white">
-                          {t.unreadByAdmin} új
+                          {fmt(t.newBadge, { count: thread.unreadByAdmin })}
                         </Badge>
                       )}
                       {isClosed && (
                         <Badge variant="outline" className="text-muted-foreground">
-                          Lezárva
+                          {t.closed}
                         </Badge>
                       )}
                     </div>
                     <p className="mt-1 truncate text-xs text-muted-foreground">
                       {last?.author === "ADMIN" && (
-                        <span className="font-medium">Te: </span>
+                        <span className="font-medium">{t.youPrefix}</span>
                       )}
                       {preview || "—"}
                     </p>
@@ -108,8 +117,8 @@ export default async function AdminSupportPage() {
                 </div>
                 <div className="flex shrink-0 items-center gap-2 text-xs text-muted-foreground">
                   <span>
-                    {formatDistanceToNow(t.lastMessageAt, {
-                      locale: hu,
+                    {formatDistanceToNow(thread.lastMessageAt, {
+                      locale: dateLocale,
                       addSuffix: true,
                     })}
                   </span>

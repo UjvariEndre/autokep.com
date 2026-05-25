@@ -4,6 +4,7 @@ import { UserButton } from "@clerk/nextjs";
 import { ArrowLeft, ShieldCheck } from "lucide-react";
 import { isAdminEmail } from "@/server/admin";
 import { getOrCreateUser } from "@/server/users";
+import { getI18n } from "@/i18n/locale";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +15,7 @@ export default async function AdminLayout({
 }) {
   const user = await getOrCreateUser();
   if (!isAdminEmail(user.email)) redirect("/dashboard");
+  const { dict } = await getI18n();
 
   return (
     <div className="min-h-screen bg-secondary/40">
@@ -25,7 +27,7 @@ export default async function AdminLayout({
               className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
             >
               <ArrowLeft className="size-4" />
-              Dashboard
+              {dict.common.dashboard}
             </Link>
             <span className="text-border">·</span>
             <span className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground">

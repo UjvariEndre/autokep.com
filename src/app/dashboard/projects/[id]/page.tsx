@@ -9,6 +9,7 @@ import {
   showroomPublicPath,
 } from "@/lib/backgrounds";
 import { getOrCreateUser } from "@/server/users";
+import { getI18n } from "@/i18n/locale";
 import { ProjectViewer } from "./viewer";
 
 export const dynamic = "force-dynamic";
@@ -20,6 +21,8 @@ export default async function ProjectPage({
 }) {
   const { id } = await params;
   const user = await getOrCreateUser();
+  const { dict } = await getI18n();
+  const t = dict.project;
 
   const project = await prisma.project.findUnique({
     where: { id },
@@ -79,7 +82,7 @@ export default async function ProjectPage({
         className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
       >
         <ArrowLeft className="size-4" />
-        Vissza a galériához
+        {t.back}
       </Link>
 
       <h1 className="mb-8 text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
@@ -110,7 +113,7 @@ export default async function ProjectPage({
         />
       ) : (
         <div className="rounded-3xl border border-border/70 bg-white p-8 text-muted-foreground shadow-soft">
-          Nincs kép a projekthez.
+          {t.noImage}
         </div>
       )}
     </>

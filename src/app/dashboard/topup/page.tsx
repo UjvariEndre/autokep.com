@@ -5,14 +5,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 import { TOPUP_PRICE_LABELS } from "@/lib/stripe";
 import { createTopupCheckout } from "@/server/actions/billing";
+import { getI18n } from "@/i18n/locale";
 
 export const dynamic = "force-dynamic";
-
-const PACK_PERKS = [
-  "Sosem jár le",
-  "Bármikor felhasználható",
-  "Előfizetés mellé is jó",
-];
 
 export default async function TopupPage({
   searchParams,
@@ -21,6 +16,9 @@ export default async function TopupPage({
 }) {
   const params = await searchParams;
   const canceled = params.canceled === "1";
+  const { locale, dict } = await getI18n();
+  const t = dict.topup;
+  const nf = (n: number) => n.toLocaleString(locale === "hu" ? "hu-HU" : "en-US");
 
   return (
     <div className="mx-auto max-w-4xl">
@@ -29,20 +27,20 @@ export default async function TopupPage({
         className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
       >
         <ArrowLeft className="size-4" />
-        Vissza a számlázáshoz
+        {t.back}
       </Link>
 
       <h1 className="text-3xl font-semibold tracking-tight md:text-4xl">
-        Top-up kredit vásárlása
+        {t.title}
       </h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        Egyszeri vásárlás, sosem jár le. Válassz csomagot.
+        {t.subtitle}
       </p>
 
       {canceled && (
         <div className="mt-6 flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-800 shadow-soft">
           <X className="mt-0.5 size-4 shrink-0" />
-          <p>A vásárlás megszakítva.</p>
+          <p>{t.canceled}</p>
         </div>
       )}
 
@@ -62,10 +60,10 @@ export default async function TopupPage({
             >
               <CardHeader>
                 <CardTitle className="flex items-center justify-between">
-                  <span>{credits} kredit</span>
+                  <span>{t.creditsLabel.replace("{credits}", String(credits))}</span>
                   {isFeatured && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-brand/10 px-2 py-0.5 text-[11px] font-medium text-brand">
-                      <Zap className="size-3" /> Ajánlott
+                      <Zap className="size-3" /> {t.recommended}
                     </span>
                   )}
                 </CardTitle>
@@ -74,17 +72,17 @@ export default async function TopupPage({
                 <div>
                   <div className="flex items-baseline gap-1.5">
                     <span className="text-3xl font-semibold tracking-tight">
-                      {huf.toLocaleString("hu-HU")}
+                      {nf(huf)}
                     </span>
-                    <span className="text-sm text-muted-foreground">Ft</span>
+                    <span className="text-sm text-muted-foreground">{t.currency}</span>
                   </div>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    {perImage.toLocaleString("hu-HU")} Ft / kép
+                    {t.perImage.replace("{price}", nf(perImage))}
                   </p>
                 </div>
 
                 <ul className="space-y-2">
-                  {PACK_PERKS.map((perk) => (
+                  {t.perks.map((perk) => (
                     <li
                       key={perk}
                       className="flex items-center gap-2 text-xs text-muted-foreground"
@@ -107,7 +105,7 @@ export default async function TopupPage({
                       "w-full",
                     )}
                   >
-                    Vásárlás
+                    {t.buy}
                   </button>
                 </form>
               </CardContent>
@@ -117,7 +115,7 @@ export default async function TopupPage({
       </div>
 
       <p className="mt-10 text-center text-xs text-muted-foreground">
-        Stripe biztonságos fizetés · Bankkártya, Apple Pay, Google Pay
+        {t.paymentNote}
       </p>
     </div>
   );

@@ -3,11 +3,12 @@
 import { useState, type ReactElement } from "react";
 import { AlertDialog } from "@base-ui/react/alert-dialog";
 import { format } from "date-fns";
-import { hu } from "date-fns/locale";
+import { hu, enUS } from "date-fns/locale";
 import { Loader2, Trash2 } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { deleteProject } from "@/server/actions/delete";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/i18n/provider";
 
 type Props = {
   projectId: string;
@@ -29,11 +30,13 @@ export function DeleteProjectDialog({
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { locale, dict } = useI18n();
+  const t = dict.deleteDialog;
 
   const dateStr = format(
     typeof createdAt === "string" ? new Date(createdAt) : createdAt,
-    "yyyy. MMMM d. HH:mm",
-    { locale: hu },
+    locale === "hu" ? "yyyy. MMMM d. HH:mm" : "MMMM d, yyyy HH:mm",
+    { locale: locale === "hu" ? hu : enUS },
   );
 
   async function handleConfirm() {
@@ -66,10 +69,10 @@ export function DeleteProjectDialog({
             <Trash2 className="size-5" />
           </div>
           <AlertDialog.Title className="text-lg font-semibold tracking-tight text-foreground">
-            Biztosan törlöd ezt a képet?
+            {t.title}
           </AlertDialog.Title>
           <AlertDialog.Description className="mt-2 text-sm text-muted-foreground">
-            A művelet nem visszavonható. Az alábbi képet véglegesen eltávolítjuk.
+            {t.description}
           </AlertDialog.Description>
 
           <div className="mt-4 rounded-2xl border border-border/60 bg-secondary/50 px-4 py-3">
@@ -88,7 +91,7 @@ export function DeleteProjectDialog({
               disabled={busy}
               className={cn(buttonVariants({ variant: "ghost" }))}
             >
-              Mégse
+              {t.cancel}
             </AlertDialog.Close>
             <button
               type="button"
@@ -101,7 +104,7 @@ export function DeleteProjectDialog({
               )}
             >
               {busy ? <Loader2 className="size-4 animate-spin" /> : null}
-              Igen, törlés
+              {t.confirm}
             </button>
           </div>
         </AlertDialog.Popup>

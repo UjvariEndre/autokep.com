@@ -10,6 +10,7 @@ import { DeleteProjectDialog } from "@/components/delete-project-dialog";
 import { BackgroundPicker } from "@/components/background-picker";
 import { cn } from "@/lib/utils";
 import { editImage } from "@/server/actions/edit";
+import { useI18n } from "@/i18n/provider";
 import type { BackgroundType, ProcessStatus } from "@/generated/prisma/enums";
 
 type Props = {
@@ -175,6 +176,9 @@ export function ProjectViewer(props: Props) {
   } = props;
 
   const router = useRouter();
+  const { dict } = useI18n();
+  const tEdit = dict.project.edit;
+  const tView = dict.project.view;
   const [mode, setMode] = useState<"view" | "edit">("view");
   const [rotateDeg, setRotateDeg] = useState(initialRotate);
   const [offsetX, setOffsetX] = useState(initialOffsetX);
@@ -265,10 +269,10 @@ export function ProjectViewer(props: Props) {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-lg font-semibold tracking-tight text-foreground">
-              Szerkesztés
+              {tEdit.title}
             </h2>
             <p className="text-xs text-muted-foreground">
-              Állítsd be a forgatást és a pozíciót.
+              {tEdit.subtitle}
             </p>
           </div>
           <div className="flex items-center gap-2">
@@ -278,16 +282,16 @@ export function ProjectViewer(props: Props) {
               disabled={saving}
               className="rounded-full px-4 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground"
             >
-              Mégsem
+              {tEdit.cancel}
             </button>
             <Button onClick={handleSave} disabled={saving || loadingAssets}>
               {saving ? (
                 <>
                   <Loader2 className="size-4 animate-spin" />
-                  Mentés
+                  {tEdit.save}
                 </>
               ) : (
-                "Mentés"
+                tEdit.save
               )}
             </Button>
           </div>
@@ -312,7 +316,7 @@ export function ProjectViewer(props: Props) {
 
         <div className="grid gap-6 rounded-3xl border border-border/70 bg-white p-6 shadow-soft sm:grid-cols-2 lg:grid-cols-4">
           <SliderField
-            label="Forgatás"
+            label={tEdit.rotate}
             value={rotateDeg}
             min={-10}
             max={10}
@@ -321,7 +325,7 @@ export function ProjectViewer(props: Props) {
             onChange={setRotateDeg}
           />
           <SliderField
-            label="Nagyítás"
+            label={tEdit.zoom}
             value={zoom}
             min={0.5}
             max={2}
@@ -332,7 +336,7 @@ export function ProjectViewer(props: Props) {
             onChange={setZoom}
           />
           <SliderField
-            label="Vízszintes (X)"
+            label={tEdit.horizontal}
             value={offsetX}
             min={-50}
             max={50}
@@ -341,7 +345,7 @@ export function ProjectViewer(props: Props) {
             onChange={setOffsetX}
           />
           <SliderField
-            label="Függőleges (Y)"
+            label={tEdit.vertical}
             value={offsetY}
             min={-50}
             max={50}
@@ -358,11 +362,10 @@ export function ProjectViewer(props: Props) {
             className="inline-flex items-center gap-1.5 text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
           >
             <RotateCcw className="size-3.5" />
-            Alaphelyzet (0°, középre)
+            {tEdit.reset}
           </button>
           <p className="text-xs text-muted-foreground">
-            Az előnézet kliensoldali — a mentésnél a szerver azonos képletet
-            alkalmaz, az eredmény pixel-pontos.
+            {tEdit.previewNote}
           </p>
         </div>
       </div>
@@ -384,19 +387,19 @@ export function ProjectViewer(props: Props) {
       <div className="grid gap-6 md:grid-cols-2">
       <section>
         <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-          Eredeti
+          {tView.original}
         </h2>
         <div className="overflow-hidden rounded-3xl border border-border/70 bg-white shadow-soft">
           {originalUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={originalUrl}
-              alt="Eredeti kép"
+              alt={tView.originalAlt}
               className="w-full object-contain"
             />
           ) : (
             <div className="flex h-64 items-center justify-center text-muted-foreground">
-              Nincs eredeti kép
+              {tView.noOriginal}
             </div>
           )}
         </div>
@@ -404,7 +407,7 @@ export function ProjectViewer(props: Props) {
 
       <section>
         <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-brand">
-          Eredmény
+          {tView.result}
         </h2>
         {status === "DONE" && processedUrl ? (
           <div className="flex flex-col gap-4">
@@ -412,7 +415,7 @@ export function ProjectViewer(props: Props) {
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={processedUrl}
-                alt="Feldolgozott kép"
+                alt={tView.processedAlt}
                 className="w-full object-contain"
               />
             </div>
@@ -423,7 +426,7 @@ export function ProjectViewer(props: Props) {
                 className={cn(buttonVariants())}
               >
                 <Download className="size-4" />
-                Letöltés
+                {tView.download}
               </a>
               {cutoutUrl && (
                 <button
@@ -432,7 +435,7 @@ export function ProjectViewer(props: Props) {
                   className={cn(buttonVariants({ variant: "outline" }))}
                 >
                   <Pencil className="size-4" />
-                  Szerkesztés
+                  {tView.edit}
                 </button>
               )}
               <DeleteProjectDialog
@@ -449,7 +452,7 @@ export function ProjectViewer(props: Props) {
                     )}
                   >
                     <Trash2 className="size-4" />
-                    Törlés
+                    {tView.delete}
                   </button>
                 }
               />
@@ -459,15 +462,15 @@ export function ProjectViewer(props: Props) {
           <div className="flex h-64 flex-col items-center justify-center gap-3 rounded-3xl border border-border/70 bg-gradient-to-br from-secondary to-accent/40 shadow-soft">
             <Loader2 className="size-8 animate-spin text-brand" />
             <span className="text-sm font-medium text-foreground">
-              Feldolgozás folyamatban...
+              {tView.processingTitle}
             </span>
             <span className="text-xs text-muted-foreground">
-              2-5 másodperc, frissül magától
+              {tView.processingNote}
             </span>
           </div>
         ) : status === "FAILED" ? (
           <div className="rounded-3xl border border-rose-200 bg-rose-50 px-5 py-6 text-sm text-rose-700 shadow-soft">
-            <p className="mb-2 font-medium">A feldolgozás nem sikerült.</p>
+            <p className="mb-2 font-medium">{tView.failedTitle}</p>
             {errorMessage && (
               <p className="mb-3 text-rose-600">{errorMessage}</p>
             )}
@@ -475,12 +478,12 @@ export function ProjectViewer(props: Props) {
               href="/dashboard/new"
               className="underline underline-offset-2 hover:no-underline"
             >
-              Új képet indítok
+              {tView.startNew}
             </Link>
           </div>
         ) : (
           <div className="flex h-64 items-center justify-center rounded-3xl border border-border/70 bg-white text-muted-foreground shadow-soft">
-            Nincs kép
+            {tView.noImage}
           </div>
         )}
       </section>

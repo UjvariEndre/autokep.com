@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { formatDistanceToNow } from "date-fns";
-import { hu } from "date-fns/locale";
+import { hu, enUS } from "date-fns/locale";
 import { ImageIcon, Plus, Sparkles, Trash2 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { getPresignedDownloadUrl } from "@/lib/r2";
@@ -8,16 +8,10 @@ import { getOrCreateUser } from "@/server/users";
 import { buttonVariants } from "@/components/ui/button";
 import { DeleteProjectDialog } from "@/components/delete-project-dialog";
 import { cn } from "@/lib/utils";
+import { getI18n } from "@/i18n/locale";
 import type { ProcessStatus } from "@/generated/prisma/enums";
 
 export const dynamic = "force-dynamic";
-
-const STATUS_LABEL: Record<ProcessStatus, string> = {
-  PENDING: "Várakozik",
-  PROCESSING: "Feldolgozás",
-  DONE: "Kész",
-  FAILED: "Hibás",
-};
 
 const STATUS_CLASSES: Record<ProcessStatus, string> = {
   PENDING: "bg-zinc-100 text-zinc-700 ring-1 ring-zinc-200",
@@ -28,6 +22,9 @@ const STATUS_CLASSES: Record<ProcessStatus, string> = {
 
 export default async function GalleryPage() {
   const user = await getOrCreateUser();
+  const { locale, dict } = await getI18n();
+  const t = dict.gallery;
+  const dateLocale = locale === "hu" ? hu : enUS;
 
   const projects = await prisma.project.findMany({
     where: { userId: user.id },
@@ -58,10 +55,10 @@ export default async function GalleryPage() {
       <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
-            Galéria
+            {t.title}
           </h1>
           <p className="mt-2 text-sm text-muted-foreground">
-            Az összes feldolgozott autós fotód egy helyen.
+            {t.subtitle}
           </p>
         </div>
         <Link
@@ -69,7 +66,7 @@ export default async function GalleryPage() {
           className={cn(buttonVariants({ size: "default" }), "hidden sm:inline-flex")}
         >
           <Plus className="size-4" />
-          Új kép
+          {t.newImage}
         </Link>
       </div>
 
@@ -84,18 +81,17 @@ export default async function GalleryPage() {
               <Sparkles className="size-6" />
             </div>
             <h2 className="text-xl font-semibold tracking-tight text-foreground">
-              Még üres a galériád
+              {t.emptyTitle}
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Tölts fel egy autós fotót, és másodpercek alatt megkapod a kész
-              showroom verziót.
+              {t.emptyBody}
             </p>
             <Link
               href="/dashboard/new"
               className={cn(buttonVariants({ size: "lg" }), "mt-6")}
             >
               <Plus className="size-4" />
-              Indítsd az elsőt
+              {t.startFirst}
             </Link>
           </div>
         </div>
@@ -133,7 +129,7 @@ export default async function GalleryPage() {
                       STATUS_CLASSES[status],
                     )}
                   >
-                    {STATUS_LABEL[status]}
+                    {t.status[status]}
                   </span>
                 </div>
                 <div className="px-5 py-4 pr-14">
@@ -143,7 +139,7 @@ export default async function GalleryPage() {
                   <p className="mt-1 text-xs text-muted-foreground">
                     {formatDistanceToNow(project.createdAt, {
                       addSuffix: true,
-                      locale: hu,
+                      locale: dateLocale,
                     })}
                   </p>
                 </div>
@@ -156,7 +152,7 @@ export default async function GalleryPage() {
                 trigger={
                   <button
                     type="button"
-                    aria-label="Kép törlése"
+                    aria-label={t.deleteAria}
                     className="absolute bottom-3 right-3 z-10 inline-flex size-9 items-center justify-center rounded-full border border-border/70 bg-white/90 text-muted-foreground shadow-soft backdrop-blur transition-colors hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300"
                   >
                     <Trash2 className="size-4" />

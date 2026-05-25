@@ -1,0 +1,331 @@
+{
+  "common": {
+    "login": "Bejelentkezés",
+    "signup": "Próbáld ki",
+    "tryFree": "Próbáld ki ingyen",
+    "getStartedFree": "Kezdj el ingyen",
+    "dashboard": "Dashboard",
+    "buy": "Vásárlás",
+    "credit": "kredit"
+  },
+  "shell": {
+    "newImage": "Új kép",
+    "topUp": "Tölts fel",
+    "loggedIn": "Bejelentkezve",
+    "openMenu": "Menü megnyitása",
+    "closeMenu": "Menü bezárása",
+    "nav": {
+      "home": "Kezdőlap",
+      "gallery": "Galéria",
+      "billing": "Számlázás",
+      "settings": "Beállítások",
+      "supportInbox": "Support inbox"
+    }
+  },
+  "settings": {
+    "title": "Beállítások",
+    "subtitle": "A fiókod és az alkalmazás beállításai.",
+    "languageLabel": "Nyelv",
+    "languageHelp": "Válaszd ki az alkalmazás nyelvét. A beállítás a fiókodhoz mentődik, így más eszközön is megmarad.",
+    "hungarian": "Magyar",
+    "english": "Angol",
+    "saved": "Mentve"
+  },
+  "landing": {
+    "nav": {
+      "features": "Funkciók",
+      "howItWorks": "Hogyan működik",
+      "pricing": "Árak"
+    },
+    "hero": {
+      "badge": "AI háttércsere autós fotókhoz",
+      "titlePrefix": "Stúdió-minőségű autós fotók ",
+      "titleHighlight": "másodpercek",
+      "titleSuffix": " alatt",
+      "subtitle": "Töltsd fel a képet, az AI levágja a hátteret, mi pedig rárakjuk a professzionális showroom hátterünket. Kereskedőknek és magánszemélyeknek.",
+      "fineprint": "Ingyenes 3 kép havonta · Bankkártya nem szükséges · JPG, PNG, WebP"
+    },
+    "beforeAfter": {
+      "eyebrow": "Élő példa",
+      "title": "Egy fotó. Két másodperc. Stúdió-háttér.",
+      "originalLabel": "Eredeti fotó",
+      "originalSublabel": "Parkoló, utca, gyenge fény",
+      "resultLabel": "Eredmény",
+      "resultSublabel": "Showroom háttérrel, AI-vágva",
+      "badgeAfter": "AI showroom",
+      "badgeBefore": "Eredeti"
+    },
+    "features": {
+      "eyebrow": "Miért Autókép?",
+      "title": "Tiszta, gyors, autó-specifikus.",
+      "intro": "Az általános háttéreltávolítók gyakran elrontják a tükröket vagy a kerekeket. Mi kifejezetten autókra fejlesztett modellt használunk.",
+      "items": [
+        {
+          "title": "Másodpercek alatt",
+          "body": "A feldolgozás 2-5 másodperc. Nem kell várni, nem kell sorba állni — azonnal megkapod a kész képet."
+        },
+        {
+          "title": "Autóra hangolt AI",
+          "body": "A remove.bg type=car modellt használjuk. A tükrök, antennák, kerekek élén is pontosan vág."
+        },
+        {
+          "title": "Magyar nyelven, magyaroknak",
+          "body": "Magyar UI, magyar ügyfélszolgálat, helyi kereskedőknek tervezve. Nincs angol setup-kör."
+        }
+      ]
+    },
+    "howItWorks": {
+      "eyebrow": "Hogyan működik",
+      "title": "Három lépés. Nulla bonyolítás.",
+      "steps": [
+        {
+          "title": "Tölts fel egy fotót",
+          "body": "Drag & drop, vagy tallózás. JPG, PNG, WebP, 12 MB-ig."
+        },
+        {
+          "title": "AI cseréli a hátteret",
+          "body": "2-5 másodperc alatt elkészül — kivágás + showroom háttér rárakása."
+        },
+        {
+          "title": "Töltsd le, használd",
+          "body": "JPG-ben letölthető, hirdetésre, OLX-re, használtautóra azonnal kész."
+        }
+      ]
+    },
+    "finalCta": {
+      "title": "Készen állsz, hogy szebbek legyenek a hirdetéseid?",
+      "subtitle": "Ingyenes 3 kép havonta. Próbáld ki most, regisztrálj 30 másodperc alatt."
+    },
+    "footer": {
+      "privacy": "Adatvédelem",
+      "terms": "ÁSZF"
+    }
+  },
+  "pricing": {
+    "nav": {
+      "home": "Főoldal",
+      "pricing": "Árak"
+    },
+    "canceled": "A vásárlás megszakítva. Bármikor visszatérhetsz, ha készen állsz.",
+    "badge": "Egyszerű, átlátható árazás",
+    "titlePrefix": "Egyszerű árazás, ",
+    "titleHighlight": "profi képek",
+    "titleSuffix": "",
+    "subtitle": "Havi előfizetés a rendszeres munkához, vagy egyszeri top-up kreditek, ha csak alkalmanként kell.",
+    "mostPopular": "Legnépszerűbb",
+    "subscription": "Előfizetés",
+    "subscriptionTagline": "Aktív kereskedőknek, akik rendszeresen készítenek új hirdetéseket.",
+    "subscriptionFeatures": [
+      "50 kép minden hónapban",
+      "Showroom stúdió hátterek",
+      "Saját háttér feltöltés",
+      "Egy kattintással letöltés",
+      "Bármikor lemondható"
+    ],
+    "perMonth": "Ft / hó",
+    "renewNote": "Havonta megújul · 50 kép / hónap",
+    "subscribe": "Feliratkozom",
+    "cancelAnytime": "Lemondás bármikor a fiókodban",
+    "topupTitle": "Több kép kell? Vegyél extra kreditet",
+    "topupSubtitle": "Egyszeri vásárlás, sosem jár le. Ideális kiegészítő az előfizetés mellé.",
+    "creditsLabel": "{credits} kredit",
+    "perImageNeverExpires": "{price} Ft / kép · Sosem jár le",
+    "currency": "Ft",
+    "fineprint": "Az árak forintban értendők, ÁFA-mentesek (alanyi adómentes vállalkozás). Lemondás bármikor a felhasználói fiókban. Visszatérítést nem áll módunkban nyújtani."
+  },
+  "dashboardHome": {
+    "badge": "AI háttércsere autós fotókhoz",
+    "titleLine1": "Tölts fel egy képet,",
+    "titleLine2": "a többit elintézzük.",
+    "subtitle": "Húzd ide az autós fotódat — 2-5 másodperc alatt cseréljük a hátteret AI-jal, és letölthető végeredményt adunk.",
+    "dropTitle": "Húzd ide az autós képet",
+    "or": "vagy",
+    "browse": "kattints a tallózáshoz",
+    "fileHint": "JPG · PNG · WebP · max 12 MB",
+    "steps": [
+      { "label": "1. Feltöltés", "text": "Drag & drop vagy tallózás" },
+      { "label": "2. AI cseréli a hátteret", "text": "2-5 másodperc alatt" },
+      { "label": "3. Letöltés", "text": "Showroom minőségű végeredmény" }
+    ]
+  },
+  "newProject": {
+    "back": "Vissza a kezdőlapra",
+    "title": "Új kép",
+    "subtitle": "Tölts fel egy autós fotót — az AI 2-5 másodperc alatt cseréli a hátteret.",
+    "errorTitle": "Hiba történt",
+    "retry": "Próbáld újra",
+    "dropTitle": "Húzd ide az autós képet",
+    "or": "vagy",
+    "browse": "kattints a tallózáshoz",
+    "fileHint": "JPG · PNG · WebP · max 12 MB",
+    "previewAlt": "Előnézet",
+    "processing": "Háttér cseréje folyamatban",
+    "processingSuffix": "— 2-5 másodperc...",
+    "chooseAnother": "Másikat választok",
+    "startProcessing": "Feldolgozás indítása",
+    "uploadFailed": "R2 feltöltés hibázott (HTTP {status})."
+  },
+  "gallery": {
+    "title": "Galéria",
+    "subtitle": "Az összes feldolgozott autós fotód egy helyen.",
+    "newImage": "Új kép",
+    "emptyTitle": "Még üres a galériád",
+    "emptyBody": "Tölts fel egy autós fotót, és másodpercek alatt megkapod a kész showroom verziót.",
+    "startFirst": "Indítsd az elsőt",
+    "deleteAria": "Kép törlése",
+    "status": {
+      "PENDING": "Várakozik",
+      "PROCESSING": "Feldolgozás",
+      "DONE": "Kész",
+      "FAILED": "Hibás"
+    }
+  },
+  "project": {
+    "back": "Vissza a galériához",
+    "noImage": "Nincs kép a projekthez.",
+    "edit": {
+      "title": "Szerkesztés",
+      "subtitle": "Állítsd be a forgatást és a pozíciót.",
+      "cancel": "Mégsem",
+      "save": "Mentés",
+      "loadError": "Kép betöltési hiba: {src}",
+      "rotate": "Forgatás",
+      "zoom": "Nagyítás",
+      "horizontal": "Vízszintes (X)",
+      "vertical": "Függőleges (Y)",
+      "reset": "Alaphelyzet (0°, középre)",
+      "previewNote": "Az előnézet kliensoldali — a mentésnél a szerver azonos képletet alkalmaz, az eredmény pixel-pontos."
+    },
+    "view": {
+      "original": "Eredeti",
+      "result": "Eredmény",
+      "originalAlt": "Eredeti kép",
+      "processedAlt": "Feldolgozott kép",
+      "noOriginal": "Nincs eredeti kép",
+      "download": "Letöltés",
+      "edit": "Szerkesztés",
+      "delete": "Törlés",
+      "processingTitle": "Feldolgozás folyamatban...",
+      "processingNote": "2-5 másodperc, frissül magától",
+      "failedTitle": "A feldolgozás nem sikerült.",
+      "startNew": "Új képet indítok",
+      "noImage": "Nincs kép"
+    }
+  },
+  "backgroundPicker": {
+    "title": "Háttér kiválasztása",
+    "customLabel": "Saját háttér",
+    "uploadAria": "Saját háttér feltöltése",
+    "uploadLabel": "Saját kép",
+    "tooLarge": "A háttérkép max 12 MB lehet.",
+    "uploadFailed": "R2 feltöltés hibázott (HTTP {status})."
+  },
+  "deleteDialog": {
+    "title": "Biztosan törlöd ezt a képet?",
+    "description": "A művelet nem visszavonható. Az alábbi képet véglegesen eltávolítjuk.",
+    "cancel": "Mégse",
+    "confirm": "Igen, törlés"
+  },
+  "billing": {
+    "title": "Számlázás",
+    "subtitle": "Az előfizetésed és a vásárlásaid áttekintése.",
+    "successSubscriptionTitle": "Sikeres előfizetés!",
+    "successSubscriptionBody": "50 kredit hozzáadva a fiókodhoz.",
+    "successTopupTitle": "Sikeres top-up vásárlás!",
+    "successTopupBody": "A kreditek elérhetők a fiókodban.",
+    "subscription": "Előfizetés",
+    "active": "Aktív",
+    "nextRenewal": "Következő megújulás: {date}",
+    "manageSubscription": "Előfizetés kezelése",
+    "canceled": "Lemondva",
+    "usableUntil": "{date}-ig használhatod",
+    "resubscribe": "Újra előfizetek",
+    "pastDue": "Sikertelen fizetés",
+    "pastDueNote": "Frissítsd a bankkártya adatokat a folytatáshoz.",
+    "updatePayment": "Fizetési mód frissítése",
+    "noSubscriptionPrefix": "Még nem fizettél elő. ",
+    "freeCreditsPrefix": "Jelenleg ",
+    "freeCreditsAmount": "{count} ingyenes kredit",
+    "freeCreditsSuffix": " áll rendelkezésedre.",
+    "subscribeNow": "Előfizetek",
+    "creditsTotal": "{count} kredit",
+    "creditsBreakdown": "{sub} havi · {topup} top-up",
+    "topupTitle": "Top-up kreditek",
+    "balance": "Egyenleg: ",
+    "balanceCredits": "{count} kredit",
+    "neverExpires": "Sosem jár le.",
+    "buyCredit": "Kredit vásárlása",
+    "purchases": "Vásárlások",
+    "noPurchases": "Még nincs vásárlásod.",
+    "colDate": "Dátum",
+    "colType": "Típus",
+    "colAmount": "Összeg",
+    "colCredit": "Kredit",
+    "typeSubscription": "Előfizetés",
+    "typeTopup": "Top-up",
+    "noDate": "—"
+  },
+  "topup": {
+    "back": "Vissza a számlázáshoz",
+    "title": "Top-up kredit vásárlása",
+    "subtitle": "Egyszeri vásárlás, sosem jár le. Válassz csomagot.",
+    "canceled": "A vásárlás megszakítva.",
+    "creditsLabel": "{credits} kredit",
+    "recommended": "Ajánlott",
+    "perImage": "{price} Ft / kép",
+    "currency": "Ft",
+    "perks": [
+      "Sosem jár le",
+      "Bármikor felhasználható",
+      "Előfizetés mellé is jó"
+    ],
+    "buy": "Vásárlás",
+    "paymentNote": "Stripe biztonságos fizetés · Bankkártya, Apple Pay, Google Pay"
+  },
+  "support": {
+    "openAria": "Üzenj nekünk",
+    "closeAria": "Chat bezárása",
+    "dialogAria": "Ügyfélszolgálati chat",
+    "headerTitle": "Segítünk",
+    "headerSignedOut": "Jelentkezz be a chathez.",
+    "headerSignedIn": "Általában néhány órán belül válaszolunk.",
+    "signInTitle": "Jelentkezz be a chathez",
+    "signInBody": "Hogy lássuk az előzményeket és vissza tudjunk írni, csak bejelentkezett felhasználóként chatelhetsz.",
+    "signIn": "Bejelentkezés",
+    "emptyTitle": "Még nincs üzenet",
+    "emptyBody": "Írd le miben tudunk segíteni. Általában néhány órán belül válaszolunk.",
+    "placeholder": "Írj egy üzenetet...",
+    "sendAria": "Küldés",
+    "you": "Te",
+    "brand": "Autokep"
+  },
+  "admin": {
+    "back": "Dashboard",
+    "title": "Support beszélgetések",
+    "summary": "{threads} beszélgetés · {unread} olvasatlan",
+    "emptyTitle": "Még nincs egy beszélgetés sem.",
+    "emptyBody": "Ha valaki ír a chatben, itt jelenik meg.",
+    "newBadge": "{count} új",
+    "closed": "Lezárva",
+    "open": "Nyitva",
+    "youPrefix": "Te: ",
+    "threadsLink": "Beszélgetések",
+    "messageCount": "{count} üzenet",
+    "reopen": "Újranyitás",
+    "close": "Lezárás",
+    "customer": "Ügyfél",
+    "thread": "Beszélgetés",
+    "subscriptionRow": "Előfizetés",
+    "noSubscription": "nincs",
+    "subCredit": "Sub kredit",
+    "topupCredit": "Top-up kredit",
+    "startedAt": "Kezdődött: {date}",
+    "replyPlaceholder": "Válasz az ügyfélnek...",
+    "sendAria": "Küldés",
+    "replyNote1": "Az ügyfél emailben is megkapja a választ.",
+    "replyTip": "Tipp:",
+    "replyTipSuffix": "küldéshez.",
+    "msgCustomer": "Ügyfél",
+    "msgYou": "Te"
+  }
+}

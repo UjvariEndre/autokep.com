@@ -9,6 +9,7 @@ import {
   getCustomBackgroundUploadUrl,
 } from "@/server/actions/background";
 import { SHOWROOM_PRESETS, showroomPublicPath } from "@/lib/backgrounds";
+import { useI18n } from "@/i18n/provider";
 import type { BackgroundType } from "@/generated/prisma/enums";
 
 type Props = {
@@ -31,6 +32,8 @@ export function BackgroundPicker({
   savedCustomUrl,
 }: Props) {
   const router = useRouter();
+  const { dict } = useI18n();
+  const t = dict.backgroundPicker;
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [busyKey, setBusyKey] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -78,7 +81,7 @@ export function BackgroundPicker({
       if (busy) return;
       setError(null);
       if (file.size > MAX_BYTES) {
-        setError("A háttérkép max 12 MB lehet.");
+        setError(t.tooLarge);
         return;
       }
       setBusyKey("upload");
@@ -93,7 +96,7 @@ export function BackgroundPicker({
           headers: { "Content-Type": file.type },
         });
         if (!putRes.ok) {
-          throw new Error(`R2 feltöltés hibázott (HTTP ${putRes.status}).`);
+          throw new Error(t.uploadFailed.replace("{status}", String(putRes.status)));
         }
         await changeBackground(imageId, "CUSTOM", { customKey: key });
         startTransition(() => router.refresh());
@@ -103,14 +106,14 @@ export function BackgroundPicker({
         setBusyKey(null);
       }
     },
-    [busy, imageId, router],
+    [busy, imageId, router, t],
   );
 
   return (
     <section className="rounded-3xl border border-border/70 bg-white p-5 shadow-soft">
       <div className="mb-3 flex items-center justify-between">
         <h2 className="text-xs font-semibold uppercase tracking-wider text-brand">
-          Háttér kiválasztása
+          {t.title}
         </h2>
         {busy && <Loader2 className="size-4 animate-spin text-brand" />}
       </div>
@@ -135,7 +138,7 @@ export function BackgroundPicker({
 
         {savedCustomKey && savedCustomUrl && (
           <BgTile
-            label="Saját háttér"
+            label={t.customLabel}
             imageUrl={savedCustomUrl}
             selected={currentBgType === "CUSTOM"}
             loading={busyKey === `custom:${savedCustomKey}`}
@@ -145,6 +148,8 @@ export function BackgroundPicker({
         )}
 
         <UploadTile
+          ariaLabel={t.uploadAria}
+          label={t.uploadLabel}
           loading={busyKey === "upload"}
           disabled={busy && busyKey !== "upload"}
           onClick={() => fileInputRef.current?.click()}
@@ -220,10 +225,14 @@ function BgTile({
 }
 
 function UploadTile({
+  ariaLabel,
+  label,
   loading,
   disabled,
   onClick,
 }: {
+  ariaLabel: string;
+  label: string;
   loading: boolean;
   disabled: boolean;
   onClick: () => void;
@@ -233,7 +242,7 @@ function UploadTile({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      aria-label="Saját háttér feltöltése"
+      aria-label={ariaLabel}
       className={cn(
         "group relative aspect-[4/3] overflow-hidden rounded-xl border-2 border-dashed bg-white text-muted-foreground transition-all",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40",
@@ -247,7 +256,7 @@ function UploadTile({
         ) : (
           <>
             <ImagePlus className="size-5" />
-            Saját kép
+            {label}
           </>
         )}
       </span>

@@ -4,9 +4,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useUser } from "@clerk/nextjs";
 import { format, isToday } from "date-fns";
-import { hu } from "date-fns/locale";
+import { hu, enUS } from "date-fns/locale";
 import { Loader2, LogIn, MessageCircle, Send, X } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/i18n/provider";
+import type { Locale } from "@/i18n/config";
 import {
   getMyThread,
   markMyThreadRead,
@@ -29,10 +31,12 @@ type Thread = {
   messages: Msg[];
 };
 
-function formatTime(iso: string): string {
+function formatTime(iso: string, locale: Locale): string {
   const d = new Date(iso);
   if (isToday(d)) return format(d, "HH:mm");
-  return format(d, "MMM d. HH:mm", { locale: hu });
+  return format(d, locale === "hu" ? "MMM d. HH:mm" : "MMM d, HH:mm", {
+    locale: locale === "hu" ? hu : enUS,
+  });
 }
 
 export function SupportChat() {
@@ -43,6 +47,8 @@ export function SupportChat() {
   const [error, setError] = useState<string | null>(null);
   const [hasUnread, setHasUnread] = useState(false);
   const { isLoaded, isSignedIn } = useUser();
+  const { locale, dict } = useI18n();
+  const t = dict.support;
   const scrollRef = useRef<HTMLDivElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
@@ -124,7 +130,7 @@ export function SupportChat() {
       {/* Floating bubble */}
       <button
         type="button"
-        aria-label={open ? "Chat bezárása" : "Üzenj nekünk"}
+        aria-label={open ? t.closeAria : t.openAria}
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
         className={cn(
@@ -144,7 +150,7 @@ export function SupportChat() {
       {/* Panel */}
       <div
         role="dialog"
-        aria-label="Ügyfélszolgálati chat"
+        aria-label={t.dialogAria}
         aria-hidden={!open}
         className={cn(
           "fixed bottom-24 right-5 z-50 flex w-[min(380px,calc(100vw-2.5rem))] origin-bottom-right flex-col overflow-hidden rounded-3xl border border-border/70 bg-white shadow-soft-lg transition-all duration-200",
@@ -156,11 +162,9 @@ export function SupportChat() {
       >
         {/* Header */}
         <div className="flex-shrink-0 bg-gradient-to-br from-brand to-brand/85 p-5 text-white">
-          <h3 className="text-base font-semibold tracking-tight">Segítünk</h3>
+          <h3 className="text-base font-semibold tracking-tight">{t.headerTitle}</h3>
           <p className="mt-1 text-xs text-white/85">
-            {!isSignedIn
-              ? "Jelentkezz be a chathez."
-              : "Általában néhány órán belül válaszolunk."}
+            {!isSignedIn ? t.headerSignedOut : t.headerSignedIn}
           </p>
         </div>
 
@@ -170,7 +174,7 @@ export function SupportChat() {
             <Loader2 className="size-5 animate-spin text-muted-foreground" />
           </div>
         ) : !isSignedIn ? (
-          <SignInPrompt />
+          <SignInPrompt t={t} />
         ) : (
           <>
             <div
@@ -178,9 +182,11 @@ export function SupportChat() {
               className="flex-1 space-y-3 overflow-y-auto bg-secondary/30 px-4 py-5"
             >
               {!thread || thread.messages.length === 0 ? (
-                <EmptyState />
+                <EmptyState t={t} />
               ) : (
-                thread.messages.map((m) => <MessageBubble key={m.id} msg={m} />)
+                thread.messages.map((m) => (
+                  <MessageBubble key={m.id} msg={m} t={t} locale={locale} />
+                ))
               )}
             </div>
 
@@ -198,7 +204,7 @@ export function SupportChat() {
                   ref={textareaRef}
                   rows={1}
                   maxLength={MAX_MESSAGE}
-                  placeholder="Írj egy üzenetet..."
+                  placeholder={t.placeholder}
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
                   onKeyDown={(e) => {
@@ -213,7 +219,7 @@ export function SupportChat() {
                 <button
                   type="submit"
                   disabled={sending || !draft.trim()}
-                  aria-label="Küldés"
+                  aria-label={t.sendAria}
                   className="inline-flex size-10 shrink-0 items-center justify-center rounded-xl bg-brand text-white shadow-soft transition-colors hover:bg-brand/90 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {sending ? (
@@ -231,43 +237,53 @@ export function SupportChat() {
   );
 }
 
-function SignInPrompt() {
+type SupportDict = ReturnType<typeof useI18n>["dict"]["support"];
+
+function SignInPrompt({ t }: { t: SupportDict }) {
   return (
     <div className="flex flex-1 flex-col items-center justify-center gap-3 px-6 py-8 text-center">
       <div className="flex size-12 items-center justify-center rounded-full bg-accent text-brand">
         <LogIn className="size-5" />
       </div>
       <p className="text-sm font-medium text-foreground">
-        Jelentkezz be a chathez
+        {t.signInTitle}
       </p>
       <p className="text-xs text-muted-foreground">
-        Hogy lássuk az előzményeket és vissza tudjunk írni, csak bejelentkezett felhasználóként chatelhetsz.
+        {t.signInBody}
       </p>
       <Link
         href="/sign-in"
         className="mt-1 inline-flex items-center gap-1.5 rounded-xl bg-brand px-4 py-2 text-sm font-medium text-white shadow-soft transition-colors hover:bg-brand/90"
       >
-        Bejelentkezés
+        {t.signIn}
       </Link>
     </div>
   );
 }
 
-function EmptyState() {
+function EmptyState({ t }: { t: SupportDict }) {
   return (
     <div className="flex h-full flex-col items-center justify-center gap-2 text-center">
       <div className="flex size-10 items-center justify-center rounded-full bg-accent text-brand">
         <MessageCircle className="size-5" />
       </div>
-      <p className="text-sm font-medium text-foreground">Még nincs üzenet</p>
+      <p className="text-sm font-medium text-foreground">{t.emptyTitle}</p>
       <p className="max-w-[240px] text-xs text-muted-foreground">
-        Írd le miben tudunk segíteni. Általában néhány órán belül válaszolunk.
+        {t.emptyBody}
       </p>
     </div>
   );
 }
 
-function MessageBubble({ msg }: { msg: Msg }) {
+function MessageBubble({
+  msg,
+  t,
+  locale,
+}: {
+  msg: Msg;
+  t: SupportDict;
+  locale: Locale;
+}) {
   const isUser = msg.author === "USER";
   return (
     <div className={cn("flex w-full", isUser ? "justify-end" : "justify-start")}>
@@ -283,7 +299,7 @@ function MessageBubble({ msg }: { msg: Msg }) {
           {msg.body}
         </div>
         <span className="px-1 text-[10px] text-muted-foreground">
-          {isUser ? "Te" : "Autokep"} · {formatTime(msg.createdAt)}
+          {isUser ? t.you : t.brand} · {formatTime(msg.createdAt, locale)}
         </span>
       </div>
     </div>

@@ -10,25 +10,35 @@ import {
 } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { LanguageToggle } from "@/components/language-toggle";
+import { getI18n } from "@/i18n/locale";
+import type { Dictionary } from "@/i18n/dictionaries";
+
+type LandingDict = Dictionary["landing"];
+type CommonDict = Dictionary["common"];
 
 export default async function Home() {
   const { userId } = await auth();
   if (userId) redirect("/dashboard");
 
+  const { dict } = await getI18n();
+  const t = dict.landing;
+  const common = dict.common;
+
   return (
     <div className="min-h-screen bg-white text-foreground">
-      <SiteNav />
-      <Hero />
-      <BeforeAfter />
-      <Features />
-      <HowItWorks />
-      <FinalCta />
-      <SiteFooter />
+      <SiteNav t={t} common={common} />
+      <Hero t={t} common={common} />
+      <BeforeAfter t={t} />
+      <Features t={t} />
+      <HowItWorks t={t} />
+      <FinalCta t={t} common={common} />
+      <SiteFooter t={t} />
     </div>
   );
 }
 
-function SiteNav() {
+function SiteNav({ t, common }: { t: LandingDict; common: CommonDict }) {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
@@ -42,24 +52,25 @@ function SiteNav() {
         </Link>
         <nav className="hidden items-center gap-7 text-sm text-muted-foreground md:flex">
           <a href="#funkciok" className="transition-colors hover:text-foreground">
-            Funkciók
+            {t.nav.features}
           </a>
           <a href="#hogyan" className="transition-colors hover:text-foreground">
-            Hogyan működik
+            {t.nav.howItWorks}
           </a>
           <Link href="/pricing" className="transition-colors hover:text-foreground">
-            Árak
+            {t.nav.pricing}
           </Link>
         </nav>
         <div className="flex items-center gap-2">
+          <LanguageToggle />
           <Link
             href="/sign-in"
             className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "hidden sm:inline-flex")}
           >
-            Bejelentkezés
+            {common.login}
           </Link>
           <Link href="/sign-up" className={cn(buttonVariants({ size: "sm" }))}>
-            Próbáld ki
+            {common.signup}
           </Link>
         </div>
       </div>
@@ -67,7 +78,7 @@ function SiteNav() {
   );
 }
 
-function Hero() {
+function Hero({ t, common }: { t: LandingDict; common: CommonDict }) {
   return (
     <section className="relative overflow-hidden">
       <div className="bg-mesh absolute inset-0 -z-10" />
@@ -76,17 +87,17 @@ function Hero() {
       <div className="mx-auto flex max-w-5xl flex-col items-center px-6 pt-20 pb-24 text-center md:pt-28 md:pb-32">
         <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-border/70 bg-white/70 px-4 py-1.5 text-xs font-medium text-muted-foreground shadow-soft backdrop-blur">
           <Sparkles className="size-3.5 text-brand" />
-          AI háttércsere autós fotókhoz
+          {t.hero.badge}
         </div>
 
         <h1 className="max-w-3xl text-5xl font-semibold leading-[1.05] tracking-tight text-foreground md:text-6xl lg:text-7xl">
-          Stúdió-minőségű autós fotók{" "}
-          <span className="text-brand">másodpercek</span> alatt
+          {t.hero.titlePrefix}
+          <span className="text-brand">{t.hero.titleHighlight}</span>
+          {t.hero.titleSuffix}
         </h1>
 
         <p className="mt-6 max-w-xl text-lg leading-relaxed text-muted-foreground md:text-xl">
-          Töltsd fel a képet, az AI levágja a hátteret, mi pedig rárakjuk
-          a professzionális showroom hátterünket. Kereskedőknek és magánszemélyeknek.
+          {t.hero.subtitle}
         </p>
 
         <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row">
@@ -94,42 +105,43 @@ function Hero() {
             href="/sign-up"
             className={cn(buttonVariants({ size: "lg" }), "min-w-[200px]")}
           >
-            Próbáld ki ingyen
+            {common.tryFree}
             <ArrowRight className="size-4" />
           </Link>
           <Link
             href="/sign-in"
             className={cn(buttonVariants({ variant: "outline", size: "lg" }), "min-w-[200px]")}
           >
-            Bejelentkezés
+            {common.login}
           </Link>
         </div>
 
         <p className="mt-6 text-sm text-muted-foreground">
-          Ingyenes 3 kép havonta · Bankkártya nem szükséges · JPG, PNG, WebP
+          {t.hero.fineprint}
         </p>
       </div>
     </section>
   );
 }
 
-function BeforeAfter() {
+function BeforeAfter({ t }: { t: LandingDict }) {
   return (
     <section className="border-t border-border/60 bg-white">
       <div className="mx-auto max-w-6xl px-6 py-20 md:py-28">
         <div className="mb-12 text-center">
           <p className="mb-3 text-sm font-medium uppercase tracking-wider text-brand">
-            Élő példa
+            {t.beforeAfter.eyebrow}
           </p>
           <h2 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
-            Egy fotó. Két másodperc. Stúdió-háttér.
+            {t.beforeAfter.title}
           </h2>
         </div>
 
         <div className="relative grid items-center gap-6 md:grid-cols-[1fr_auto_1fr]">
           <DemoCard
-            label="Eredeti fotó"
-            sublabel="Parkoló, utca, gyenge fény"
+            label={t.beforeAfter.originalLabel}
+            sublabel={t.beforeAfter.originalSublabel}
+            badge={t.beforeAfter.badgeBefore}
             tone="before"
             imageSrc="/images/landing/before.jpg"
           />
@@ -144,8 +156,9 @@ function BeforeAfter() {
             </div>
           </div>
           <DemoCard
-            label="Eredmény"
-            sublabel="Showroom háttérrel, AI-vágva"
+            label={t.beforeAfter.resultLabel}
+            sublabel={t.beforeAfter.resultSublabel}
+            badge={t.beforeAfter.badgeAfter}
             tone="after"
             imageSrc="/images/landing/after.jpg"
           />
@@ -158,11 +171,13 @@ function BeforeAfter() {
 function DemoCard({
   label,
   sublabel,
+  badge,
   imageSrc,
   tone,
 }: {
   label: string;
   sublabel: string;
+  badge: string;
   imageSrc: string;
   tone: "before" | "after";
 }) {
@@ -183,7 +198,7 @@ function DemoCard({
               : "bg-black/55 text-white",
           )}
         >
-          {isAfter ? "AI showroom" : "Eredeti"}
+          {badge}
         </span>
       </div>
       <div className="px-1">
@@ -194,59 +209,42 @@ function DemoCard({
   );
 }
 
-const FEATURES = [
-  {
-    icon: Zap,
-    title: "Másodpercek alatt",
-    body:
-      "A feldolgozás 2-5 másodperc. Nem kell várni, nem kell sorba állni — azonnal megkapod a kész képet.",
-  },
-  {
-    icon: Wand2,
-    title: "Autóra hangolt AI",
-    body:
-      "A remove.bg type=car modellt használjuk. A tükrök, antennák, kerekek élén is pontosan vág.",
-  },
-  {
-    icon: Sparkles,
-    title: "Magyar nyelven, magyaroknak",
-    body:
-      "Magyar UI, magyar ügyfélszolgálat, helyi kereskedőknek tervezve. Nincs angol setup-kör.",
-  },
-];
+const FEATURE_ICONS = [Zap, Wand2, Sparkles];
 
-function Features() {
+function Features({ t }: { t: LandingDict }) {
   return (
     <section id="funkciok" className="border-t border-border/60 bg-secondary/40">
       <div className="mx-auto max-w-6xl px-6 py-20 md:py-28">
         <div className="mb-12 max-w-2xl">
           <p className="mb-3 text-sm font-medium uppercase tracking-wider text-brand">
-            Miért Autókép?
+            {t.features.eyebrow}
           </p>
           <h2 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
-            Tiszta, gyors, autó-specifikus.
+            {t.features.title}
           </h2>
           <p className="mt-4 text-base text-muted-foreground">
-            Az általános háttéreltávolítók gyakran elrontják a tükröket vagy a kerekeket.
-            Mi kifejezetten autókra fejlesztett modellt használunk.
+            {t.features.intro}
           </p>
         </div>
 
         <div className="grid gap-5 md:grid-cols-3">
-          {FEATURES.map((f) => (
-            <div
-              key={f.title}
-              className="group relative rounded-2xl border border-border/70 bg-white p-7 shadow-soft transition-all hover:-translate-y-1 hover:shadow-soft-lg"
-            >
-              <div className="mb-5 inline-flex size-11 items-center justify-center rounded-xl bg-accent text-accent-foreground transition-colors group-hover:bg-brand group-hover:text-white">
-                <f.icon className="size-5" />
+          {t.features.items.map((f, i) => {
+            const Icon = FEATURE_ICONS[i] ?? Sparkles;
+            return (
+              <div
+                key={f.title}
+                className="group relative rounded-2xl border border-border/70 bg-white p-7 shadow-soft transition-all hover:-translate-y-1 hover:shadow-soft-lg"
+              >
+                <div className="mb-5 inline-flex size-11 items-center justify-center rounded-xl bg-accent text-accent-foreground transition-colors group-hover:bg-brand group-hover:text-white">
+                  <Icon className="size-5" />
+                </div>
+                <h3 className="mb-2 text-lg font-semibold tracking-tight text-foreground">
+                  {f.title}
+                </h3>
+                <p className="text-sm leading-relaxed text-muted-foreground">{f.body}</p>
               </div>
-              <h3 className="mb-2 text-lg font-semibold tracking-tight text-foreground">
-                {f.title}
-              </h3>
-              <p className="text-sm leading-relaxed text-muted-foreground">{f.body}</p>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
@@ -354,34 +352,18 @@ function StepDownloadArt() {
   );
 }
 
-const STEPS = [
-  {
-    Art: StepUploadArt,
-    title: "Tölts fel egy fotót",
-    body: "Drag & drop, vagy tallózás. JPG, PNG, WebP, 12 MB-ig.",
-  },
-  {
-    Art: StepMagicArt,
-    title: "AI cseréli a hátteret",
-    body: "2-5 másodperc alatt elkészül — kivágás + showroom háttér rárakása.",
-  },
-  {
-    Art: StepDownloadArt,
-    title: "Töltsd le, használd",
-    body: "JPG-ben letölthető, hirdetésre, OLX-re, használtautóra azonnal kész.",
-  },
-];
+const STEP_ARTS = [StepUploadArt, StepMagicArt, StepDownloadArt];
 
-function HowItWorks() {
+function HowItWorks({ t }: { t: LandingDict }) {
   return (
     <section id="hogyan" className="border-t border-border/60 bg-white">
       <div className="mx-auto max-w-6xl px-6 py-20 md:py-28">
         <div className="mb-14 text-center">
           <p className="mb-3 text-sm font-medium uppercase tracking-wider text-brand">
-            Hogyan működik
+            {t.howItWorks.eyebrow}
           </p>
           <h2 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
-            Három lépés. Nulla bonyolítás.
+            {t.howItWorks.title}
           </h2>
         </div>
 
@@ -391,11 +373,13 @@ function HowItWorks() {
             aria-hidden
             className="pointer-events-none absolute inset-x-[16%] top-[2.75rem] hidden h-px bg-gradient-to-r from-transparent via-border to-transparent md:block"
           />
-          {STEPS.map((s, i) => (
+          {t.howItWorks.steps.map((s, i) => {
+            const Art = STEP_ARTS[i] ?? StepUploadArt;
+            return (
             <div key={s.title} className="relative flex flex-col items-center text-center">
               <div className="relative mb-5">
                 <div className="flex size-22 items-center justify-center rounded-3xl border border-border/70 bg-white shadow-soft">
-                  <s.Art />
+                  <Art />
                 </div>
                 <span className="absolute -right-2 -top-2 flex size-7 items-center justify-center rounded-full bg-brand text-xs font-semibold text-white shadow-soft">
                   {i + 1}
@@ -408,14 +392,15 @@ function HowItWorks() {
                 {s.body}
               </p>
             </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </section>
   );
 }
 
-function FinalCta() {
+function FinalCta({ t, common }: { t: LandingDict; common: CommonDict }) {
   return (
     <section id="arak" className="border-t border-border/60 bg-secondary/40">
       <div className="mx-auto max-w-5xl px-6 py-20 md:py-28">
@@ -431,24 +416,24 @@ function FinalCta() {
           />
           <div className="relative">
             <h2 className="text-3xl font-semibold tracking-tight text-white md:text-5xl">
-              Készen állsz, hogy szebbek legyenek a hirdetéseid?
+              {t.finalCta.title}
             </h2>
             <p className="mx-auto mt-5 max-w-xl text-base text-white/85 md:text-lg">
-              Ingyenes 3 kép havonta. Próbáld ki most, regisztrálj 30 másodperc alatt.
+              {t.finalCta.subtitle}
             </p>
             <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
               <Link
                 href="/sign-up"
                 className="inline-flex h-12 min-w-[200px] items-center justify-center gap-2 rounded-full bg-white px-6 text-base font-medium text-foreground shadow-soft transition-all hover:bg-white/95 hover:shadow-soft-lg"
               >
-                Kezdj el ingyen
+                {common.getStartedFree}
                 <ArrowRight className="size-4" />
               </Link>
               <Link
                 href="/sign-in"
                 className="inline-flex h-12 min-w-[200px] items-center justify-center rounded-full border border-white/30 px-6 text-base font-medium text-white transition-colors hover:bg-white/10"
               >
-                Bejelentkezés
+                {common.login}
               </Link>
             </div>
           </div>
@@ -458,7 +443,7 @@ function FinalCta() {
   );
 }
 
-function SiteFooter() {
+function SiteFooter({ t }: { t: LandingDict }) {
   return (
     <footer className="border-t border-border/60 bg-white">
       <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-10 text-sm text-muted-foreground md:flex-row">
@@ -474,10 +459,10 @@ function SiteFooter() {
             hello@autokep.com
           </a>
           <a href="#" className="transition-colors hover:text-foreground">
-            Adatvédelem
+            {t.footer.privacy}
           </a>
           <a href="#" className="transition-colors hover:text-foreground">
-            ÁSZF
+            {t.footer.terms}
           </a>
         </div>
       </div>

@@ -6,11 +6,15 @@ import { useDropzone } from "react-dropzone";
 import { Car, Sparkles, Upload, Wand2 } from "lucide-react";
 import { setPendingFile } from "@/lib/upload-store";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/i18n/provider";
 
 const MAX_BYTES = 12 * 1024 * 1024;
 
 export default function DashboardHomePage() {
   const router = useRouter();
+  const { dict } = useI18n();
+  const t = dict.dashboardHome;
+  const stepIcons = [Upload, Wand2, Sparkles];
 
   const onDrop = useCallback(
     (accepted: File[]) => {
@@ -44,16 +48,15 @@ export default function DashboardHomePage() {
 
         <span className="inline-flex items-center gap-1.5 rounded-full bg-accent px-3 py-1 text-xs font-medium text-accent-foreground">
           <Sparkles className="size-3.5 text-brand" />
-          AI háttércsere autós fotókhoz
+          {t.badge}
         </span>
 
         <h1 className="mt-5 font-heading text-4xl font-semibold tracking-tight text-foreground md:text-5xl">
-          Tölts fel egy képet,<br />
-          a többit elintézzük.
+          {t.titleLine1}<br />
+          {t.titleLine2}
         </h1>
         <p className="mt-4 max-w-xl text-base text-muted-foreground md:text-lg">
-          Húzd ide az autós fotódat — 2-5 másodperc alatt cseréljük a hátteret
-          AI-jal, és letölthető végeredményt adunk.
+          {t.subtitle}
         </p>
       </div>
 
@@ -79,26 +82,24 @@ export default function DashboardHomePage() {
           <Upload className="size-7" />
         </div>
         <p className="text-lg font-medium text-foreground">
-          Húzd ide az autós képet
+          {t.dropTitle}
         </p>
         <p className="mt-2 text-sm text-muted-foreground">
-          vagy{" "}
+          {t.or}{" "}
           <span className="text-brand underline-offset-2 hover:underline">
-            kattints a tallózáshoz
+            {t.browse}
           </span>
         </p>
         <p className="mt-6 text-xs text-muted-foreground">
-          JPG · PNG · WebP · max 12 MB
+          {t.fileHint}
         </p>
       </div>
 
       {/* Mini steps */}
       <div className="mt-10 grid gap-4 sm:grid-cols-3">
-        {[
-          { icon: Upload, label: "1. Feltöltés", text: "Drag & drop vagy tallózás" },
-          { icon: Wand2, label: "2. AI cseréli a hátteret", text: "2-5 másodperc alatt" },
-          { icon: Sparkles, label: "3. Letöltés", text: "Showroom minőségű végeredmény" },
-        ].map(({ icon: Icon, label, text }) => (
+        {t.steps.map(({ label, text }, i) => {
+          const Icon = stepIcons[i] ?? Upload;
+          return (
           <div
             key={label}
             className="rounded-2xl border border-border/70 bg-white p-4 shadow-soft"
@@ -109,7 +110,8 @@ export default function DashboardHomePage() {
             <p className="text-sm font-medium text-foreground">{label}</p>
             <p className="mt-0.5 text-xs text-muted-foreground">{text}</p>
           </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

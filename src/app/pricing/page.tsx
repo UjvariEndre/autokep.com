@@ -3,18 +3,14 @@ import { auth } from "@clerk/nextjs/server";
 import { ArrowRight, Car, Check, Sparkles, X } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { LanguageToggle } from "@/components/language-toggle";
 import { TOPUP_PRICE_LABELS } from "@/lib/stripe";
 import { createSubscriptionCheckout } from "@/server/actions/billing";
+import { getI18n } from "@/i18n/locale";
+import type { Dictionary } from "@/i18n/dictionaries";
+import type { Locale } from "@/i18n/config";
 
 export const dynamic = "force-dynamic";
-
-const SUBSCRIPTION_FEATURES = [
-  "50 kép minden hónapban",
-  "Showroom stúdió hátterek",
-  "Saját háttér feltöltés",
-  "Egy kattintással letöltés",
-  "Bármikor lemondható",
-];
 
 export default async function PricingPage({
   searchParams,
@@ -25,29 +21,34 @@ export default async function PricingPage({
   const canceled = params.canceled === "1";
   const { userId } = await auth();
   const isAuthed = Boolean(userId);
+  const { locale, dict } = await getI18n();
+  const t = dict.pricing;
+  const nf = (n: number) => n.toLocaleString(locale === "hu" ? "hu-HU" : "en-US");
 
   return (
     <div className="min-h-screen bg-white text-foreground">
-      <SiteNav isAuthed={isAuthed} />
+      <SiteNav isAuthed={isAuthed} t={t} common={dict.common} />
 
       <main className="mx-auto max-w-5xl px-6 pb-24 pt-16 md:pt-20">
         {canceled && (
           <div className="mb-8 flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm text-amber-800 shadow-soft">
             <X className="mt-0.5 size-4 shrink-0" />
-            <p>A vásárlás megszakítva. Bármikor visszatérhetsz, ha készen állsz.</p>
+            <p>{t.canceled}</p>
           </div>
         )}
 
         <div className="mb-14 text-center">
           <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-border/70 bg-white px-4 py-1.5 text-xs font-medium text-muted-foreground shadow-soft">
             <Sparkles className="size-3.5 text-brand" />
-            Egyszerű, átlátható árazás
+            {t.badge}
           </div>
           <h1 className="text-4xl font-semibold leading-tight tracking-tight md:text-5xl">
-            Egyszerű árazás, <span className="text-brand">profi képek</span>
+            {t.titlePrefix}
+            <span className="text-brand">{t.titleHighlight}</span>
+            {t.titleSuffix}
           </h1>
           <p className="mx-auto mt-4 max-w-xl text-base text-muted-foreground md:text-lg">
-            Havi előfizetés a rendszeres munkához, vagy egyszeri top-up kreditek, ha csak alkalmanként kell.
+            {t.subtitle}
           </p>
         </div>
 
@@ -58,16 +59,16 @@ export default async function PricingPage({
             <div className="relative grid items-start gap-10 md:grid-cols-[1.4fr_1fr]">
               <div>
                 <span className="inline-flex items-center rounded-full bg-brand px-3 py-1 text-xs font-medium text-white shadow-soft">
-                  Legnépszerűbb
+                  {t.mostPopular}
                 </span>
                 <h2 className="mt-4 text-2xl font-semibold tracking-tight md:text-3xl">
-                  Előfizetés
+                  {t.subscription}
                 </h2>
                 <p className="mt-2 max-w-md text-sm text-muted-foreground">
-                  Aktív kereskedőknek, akik rendszeresen készítenek új hirdetéseket.
+                  {t.subscriptionTagline}
                 </p>
                 <ul className="mt-6 space-y-2.5">
-                  {SUBSCRIPTION_FEATURES.map((f) => (
+                  {t.subscriptionFeatures.map((f) => (
                     <li key={f} className="flex items-center gap-2.5 text-sm text-foreground">
                       <span className="flex size-5 items-center justify-center rounded-full bg-brand/10 text-brand">
                         <Check className="size-3" />
@@ -82,12 +83,12 @@ export default async function PricingPage({
                 <div>
                   <div className="flex items-baseline gap-1.5">
                     <span className="text-4xl font-semibold tracking-tight md:text-5xl">
-                      9 780
+                      {nf(9780)}
                     </span>
-                    <span className="text-base text-muted-foreground">Ft / hó</span>
+                    <span className="text-base text-muted-foreground">{t.perMonth}</span>
                   </div>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    Havonta megújul · 50 kép / hónap
+                    {t.renewNote}
                   </p>
                 </div>
 
@@ -97,7 +98,7 @@ export default async function PricingPage({
                       type="submit"
                       className={cn(buttonVariants({ size: "lg" }), "w-full")}
                     >
-                      Feliratkozom
+                      {t.subscribe}
                       <ArrowRight className="size-4" />
                     </button>
                   </form>
@@ -106,13 +107,13 @@ export default async function PricingPage({
                     href="/sign-up?redirect_url=/pricing"
                     className={cn(buttonVariants({ size: "lg" }), "w-full")}
                   >
-                    Feliratkozom
+                    {t.subscribe}
                     <ArrowRight className="size-4" />
                   </Link>
                 )}
 
                 <p className="text-center text-[11px] text-muted-foreground">
-                  Lemondás bármikor a fiókodban
+                  {t.cancelAnytime}
                 </p>
               </div>
             </div>
@@ -123,10 +124,10 @@ export default async function PricingPage({
         <div>
           <div className="mb-8 text-center">
             <h2 className="text-2xl font-semibold tracking-tight md:text-3xl">
-              Több kép kell? Vegyél extra kreditet
+              {t.topupTitle}
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Egyszeri vásárlás, sosem jár le. Ideális kiegészítő az előfizetés mellé.
+              {t.topupSubtitle}
             </p>
           </div>
 
@@ -139,16 +140,16 @@ export default async function PricingPage({
                   className="flex flex-col rounded-2xl border border-border/70 bg-white p-6 shadow-soft transition-all hover:-translate-y-1 hover:shadow-soft-lg"
                 >
                   <h3 className="text-lg font-semibold tracking-tight">
-                    {credits} kredit
+                    {t.creditsLabel.replace("{credits}", String(credits))}
                   </h3>
                   <div className="mt-3 flex items-baseline gap-1.5">
                     <span className="text-3xl font-semibold tracking-tight">
-                      {huf.toLocaleString("hu-HU")}
+                      {nf(huf)}
                     </span>
-                    <span className="text-sm text-muted-foreground">Ft</span>
+                    <span className="text-sm text-muted-foreground">{t.currency}</span>
                   </div>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    {perImage.toLocaleString("hu-HU")} Ft / kép · Sosem jár le
+                    {t.perImageNeverExpires.replace("{price}", nf(perImage))}
                   </p>
 
                   {isAuthed ? (
@@ -159,7 +160,7 @@ export default async function PricingPage({
                         "mt-5 w-full",
                       )}
                     >
-                      Vásárlás
+                      {dict.common.buy}
                     </Link>
                   ) : (
                     <Link
@@ -169,7 +170,7 @@ export default async function PricingPage({
                         "mt-5 w-full",
                       )}
                     >
-                      Vásárlás
+                      {dict.common.buy}
                     </Link>
                   )}
                 </div>
@@ -179,15 +180,22 @@ export default async function PricingPage({
         </div>
 
         <p className="mx-auto mt-16 max-w-xl text-center text-xs text-muted-foreground">
-          Az árak forintban értendők, ÁFA-mentesek (alanyi adómentes vállalkozás).
-          Lemondás bármikor a felhasználói fiókban. Visszatérítést nem áll módunkban nyújtani.
+          {t.fineprint}
         </p>
       </main>
     </div>
   );
 }
 
-function SiteNav({ isAuthed }: { isAuthed: boolean }) {
+function SiteNav({
+  isAuthed,
+  t,
+  common,
+}: {
+  isAuthed: boolean;
+  t: Dictionary["pricing"];
+  common: Dictionary["common"];
+}) {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/60 bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-6">
@@ -201,16 +209,17 @@ function SiteNav({ isAuthed }: { isAuthed: boolean }) {
         </Link>
         <nav className="hidden items-center gap-7 text-sm text-muted-foreground md:flex">
           <Link href="/" className="transition-colors hover:text-foreground">
-            Főoldal
+            {t.nav.home}
           </Link>
           <Link href="/pricing" className="text-foreground transition-colors">
-            Árak
+            {t.nav.pricing}
           </Link>
         </nav>
         <div className="flex items-center gap-2">
+          <LanguageToggle />
           {isAuthed ? (
             <Link href="/dashboard" className={cn(buttonVariants({ size: "sm" }))}>
-              Dashboard
+              {common.dashboard}
             </Link>
           ) : (
             <>
@@ -218,10 +227,10 @@ function SiteNav({ isAuthed }: { isAuthed: boolean }) {
                 href="/sign-in"
                 className={cn(buttonVariants({ variant: "ghost", size: "sm" }), "hidden sm:inline-flex")}
               >
-                Bejelentkezés
+                {common.login}
               </Link>
               <Link href="/sign-up" className={cn(buttonVariants({ size: "sm" }))}>
-                Próbáld ki
+                {common.signup}
               </Link>
             </>
           )}

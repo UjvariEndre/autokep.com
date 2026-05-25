@@ -10,11 +10,14 @@ import { getUploadUrl } from "@/server/actions/upload";
 import { processImage } from "@/server/actions/process";
 import { takePendingFile } from "@/lib/upload-store";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/i18n/provider";
 
 const MAX_BYTES = 12 * 1024 * 1024;
 
 export default function NewProjectPage() {
   const router = useRouter();
+  const { dict } = useI18n();
+  const t = dict.newProject;
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -65,7 +68,7 @@ export default function NewProjectPage() {
         headers: { "Content-Type": file.type },
       });
       if (!putRes.ok) {
-        throw new Error(`R2 feltöltés hibázott (HTTP ${putRes.status}).`);
+        throw new Error(t.uploadFailed.replace("{status}", String(putRes.status)));
       }
       const { projectId } = await processImage(key, file.name);
       router.push(`/dashboard/projects/${projectId}`);
@@ -87,26 +90,26 @@ export default function NewProjectPage() {
         className="mb-6 inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
       >
         <ArrowLeft className="size-4" />
-        Vissza a kezdőlapra
+        {t.back}
       </Link>
 
       <h1 className="text-3xl font-semibold tracking-tight text-foreground md:text-4xl">
-        Új kép
+        {t.title}
       </h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        Tölts fel egy autós fotót — az AI 2-5 másodperc alatt cseréli a hátteret.
+        {t.subtitle}
       </p>
 
       {error && (
         <div className="mt-6 rounded-2xl border border-rose-200 bg-rose-50 px-5 py-4 text-sm text-rose-700 shadow-soft">
-          <p className="font-medium">Hiba történt</p>
+          <p className="font-medium">{t.errorTitle}</p>
           <p className="mt-1">{error}</p>
           <button
             type="button"
             className="mt-2 underline underline-offset-2 hover:no-underline"
             onClick={() => setError(null)}
           >
-            Próbáld újra
+            {t.retry}
           </button>
         </div>
       )}
@@ -133,13 +136,13 @@ export default function NewProjectPage() {
             <Upload className="size-7" />
           </div>
           <p className="text-lg font-medium text-foreground">
-            Húzd ide az autós képet
+            {t.dropTitle}
           </p>
           <p className="mt-2 text-sm text-muted-foreground">
-            vagy <span className="text-brand underline-offset-2 hover:underline">kattints a tallózáshoz</span>
+            {t.or} <span className="text-brand underline-offset-2 hover:underline">{t.browse}</span>
           </p>
           <p className="mt-6 text-xs text-muted-foreground">
-            JPG · PNG · WebP · max 12 MB
+            {t.fileHint}
           </p>
         </div>
       )}
@@ -150,7 +153,7 @@ export default function NewProjectPage() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={previewUrl}
-              alt="Előnézet"
+              alt={t.previewAlt}
               className="max-h-[500px] w-full object-contain"
             />
           </div>
@@ -158,8 +161,8 @@ export default function NewProjectPage() {
           {isProcessing ? (
             <div className="flex items-center gap-3 rounded-2xl border border-indigo-100 bg-accent/60 px-5 py-4 text-sm text-accent-foreground shadow-soft">
               <Loader2 className="size-5 animate-spin text-brand" />
-              <span className="font-medium">Háttér cseréje folyamatban</span>
-              <span className="text-muted-foreground">— 2-5 másodperc...</span>
+              <span className="font-medium">{t.processing}</span>
+              <span className="text-muted-foreground">{t.processingSuffix}</span>
             </div>
           ) : (
             <div className="flex items-center justify-between gap-4">
@@ -169,11 +172,11 @@ export default function NewProjectPage() {
                 onClick={() => setFile(null)}
               >
                 <ImageIcon className="size-4" />
-                Másikat választok
+                {t.chooseAnother}
               </button>
               <Button onClick={handleSubmit} disabled={isProcessing} size="lg">
                 <Wand2 className="size-4" />
-                Feldolgozás indítása
+                {t.startProcessing}
               </Button>
             </div>
           )}

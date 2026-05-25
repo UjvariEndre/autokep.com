@@ -4,9 +4,10 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { UserButton } from "@clerk/nextjs";
-import { Car, Coins, Home, Images, Menu, Plus, ShieldCheck, X } from "lucide-react";
+import { Car, Coins, Home, Images, Menu, Plus, Settings, ShieldCheck, X } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { useI18n } from "@/i18n/provider";
 
 type Props = {
   subscriptionCredits: number;
@@ -16,22 +17,25 @@ type Props = {
   children: React.ReactNode;
 };
 
-const NAV_ITEMS = [
-  { href: "/dashboard", label: "Kezdőlap", icon: Home, match: "exact" as const },
-  { href: "/dashboard/galeria", label: "Galéria", icon: Images, match: "prefix" as const },
-  { href: "/dashboard/billing", label: "Számlázás", icon: Coins, match: "prefix" as const },
-];
-
-const ADMIN_NAV_ITEM = {
-  href: "/admin/support",
-  label: "Support inbox",
-  icon: ShieldCheck,
-  match: "prefix" as const,
-};
-
 export function DashboardShell({ subscriptionCredits, topupCredits, email, isAdmin, children }: Props) {
+  const { dict } = useI18n();
+  const t = dict.shell;
+
+  const baseNavItems = [
+    { href: "/dashboard", label: t.nav.home, icon: Home, match: "exact" as const },
+    { href: "/dashboard/galeria", label: t.nav.gallery, icon: Images, match: "prefix" as const },
+    { href: "/dashboard/billing", label: t.nav.billing, icon: Coins, match: "prefix" as const },
+    { href: "/dashboard/settings", label: t.nav.settings, icon: Settings, match: "prefix" as const },
+  ];
+  const adminNavItem = {
+    href: "/admin/support",
+    label: t.nav.supportInbox,
+    icon: ShieldCheck,
+    match: "prefix" as const,
+  };
+
   const totalCredits = subscriptionCredits + topupCredits;
-  const navItems = isAdmin ? [...NAV_ITEMS, ADMIN_NAV_ITEM] : NAV_ITEMS;
+  const navItems = isAdmin ? [...baseNavItems, adminNavItem] : baseNavItems;
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
 
@@ -62,7 +66,7 @@ export function DashboardShell({ subscriptionCredits, topupCredits, email, isAdm
           className={cn(buttonVariants({ size: "default" }), "w-full")}
         >
           <Plus className="size-4" />
-          Új kép
+          {t.newImage}
         </Link>
       </div>
 
@@ -96,7 +100,7 @@ export function DashboardShell({ subscriptionCredits, topupCredits, email, isAdm
             <Coins className="size-4 text-brand" />
             <span className="font-medium text-foreground">{totalCredits}</span>
             <span className="text-muted-foreground">
-              kredit
+              {dict.common.credit}
               {topupCredits > 0 && (
                 <span className="ml-1 text-[11px]">
                   ({subscriptionCredits}+{topupCredits})
@@ -110,7 +114,7 @@ export function DashboardShell({ subscriptionCredits, topupCredits, email, isAdm
               onClick={() => setMobileOpen(false)}
               className="rounded-md bg-brand px-2 py-0.5 text-[11px] font-medium text-white hover:bg-brand/90"
             >
-              Tölts fel
+              {t.topUp}
             </Link>
           )}
         </div>
@@ -122,7 +126,7 @@ export function DashboardShell({ subscriptionCredits, topupCredits, email, isAdm
           />
           <div className="min-w-0 flex-1">
             <p className="truncate text-xs font-medium text-foreground">{email}</p>
-            <p className="text-[11px] text-muted-foreground">Bejelentkezve</p>
+            <p className="text-[11px] text-muted-foreground">{t.loggedIn}</p>
           </div>
         </div>
       </div>
@@ -142,11 +146,11 @@ export function DashboardShell({ subscriptionCredits, topupCredits, email, isAdm
         <div className="flex items-center gap-2">
           <span className="inline-flex items-center gap-1 rounded-full bg-accent px-2.5 py-1 text-xs font-medium text-accent-foreground">
             <Coins className="size-3" />
-            {totalCredits} kredit
+            {totalCredits} {dict.common.credit}
           </span>
           <button
             type="button"
-            aria-label="Menü megnyitása"
+            aria-label={t.openMenu}
             onClick={() => setMobileOpen(true)}
             className="inline-flex size-9 items-center justify-center rounded-lg text-foreground hover:bg-secondary"
           >
@@ -171,7 +175,7 @@ export function DashboardShell({ subscriptionCredits, topupCredits, email, isAdm
           <div className="absolute inset-y-0 left-0 w-72 border-r border-border bg-sidebar shadow-soft-lg">
             <button
               type="button"
-              aria-label="Menü bezárása"
+              aria-label={t.closeMenu}
               onClick={() => setMobileOpen(false)}
               className="absolute right-3 top-3 inline-flex size-9 items-center justify-center rounded-lg text-muted-foreground hover:bg-secondary"
             >

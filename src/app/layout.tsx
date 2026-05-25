@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import { ClerkProvider } from "@clerk/nextjs";
-import { huHU } from "@clerk/localizations";
+import { huHU, enUS } from "@clerk/localizations";
 import { Inter, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import { SupportChat } from "@/components/support-chat";
+import { getI18n } from "@/i18n/locale";
+import { I18nProvider } from "@/i18n/provider";
 import "./globals.css";
 
 const inter = Inter({
@@ -23,25 +25,32 @@ const jetbrainsMono = JetBrains_Mono({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: "autokep.com",
-  description: "AI háttércsere autós fotókhoz",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { dict } = await getI18n();
+  return {
+    title: "autokep.com",
+    description: dict.landing.hero.badge,
+  };
+}
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { locale, dict } = await getI18n();
+
   return (
-    <ClerkProvider localization={huHU}>
+    <ClerkProvider localization={locale === "hu" ? huHU : enUS}>
       <html
-        lang="hu"
+        lang={locale}
         className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable} h-full antialiased`}
       >
         <body className="min-h-full flex flex-col font-sans">
-          {children}
-          <SupportChat />
+          <I18nProvider locale={locale} dict={dict}>
+            {children}
+            <SupportChat />
+          </I18nProvider>
         </body>
       </html>
     </ClerkProvider>
