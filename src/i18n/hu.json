@@ -177,6 +177,9 @@
     "emptyBody": "Tölts fel egy autós fotót, és másodpercek alatt megkapod a kész showroom verziót.",
     "startFirst": "Indítsd az elsőt",
     "deleteAria": "Kép törlése",
+    "prevPage": "Előző oldal",
+    "nextPage": "Következő oldal",
+    "pageInfo": "{page} / {total}. oldal",
     "status": {
       "PENDING": "Várakozik",
       "PROCESSING": "Feldolgozás",

@@ -177,6 +177,9 @@
     "emptyBody": "Upload a car photo and get the finished showroom version in seconds.",
     "startFirst": "Start your first one",
     "deleteAria": "Delete image",
+    "prevPage": "Previous page",
+    "nextPage": "Next page",
+    "pageInfo": "Page {page} of {total}",
     "status": {
       "PENDING": "Pending",
       "PROCESSING": "Processing",
