@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { UserButton } from "@clerk/nextjs";
@@ -39,6 +39,13 @@ export function DashboardShell({ subscriptionCredits, topupCredits, email, isAdm
   const navItems = isAdmin ? [...baseNavItems, adminNavItem] : baseNavItems;
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
+
+  // Clerk's <UserButton> renders differently during SSR vs. on the client,
+  // which shifts its siblings and triggers a hydration mismatch. Render it only
+  // after mount (with a same-size placeholder) so SSR and first client render
+  // agree.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
 
   function isActive(href: string, match: "exact" | "prefix") {
     if (match === "exact") return pathname === href;
@@ -120,11 +127,15 @@ export function DashboardShell({ subscriptionCredits, topupCredits, email, isAdm
           )}
         </div>
         <div className="flex items-center gap-3 rounded-xl px-1 py-1">
-          <UserButton
-            appearance={{
-              elements: { avatarBox: "size-8" },
-            }}
-          />
+          {mounted ? (
+            <UserButton
+              appearance={{
+                elements: { avatarBox: "size-8" },
+              }}
+            />
+          ) : (
+            <div className="size-8 shrink-0 rounded-full bg-muted" aria-hidden />
+          )}
           <div className="min-w-0 flex-1">
             <p className="truncate text-xs font-medium text-foreground">{email}</p>
             <p className="text-[11px] text-muted-foreground">{t.loggedIn}</p>
