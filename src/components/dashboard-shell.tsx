@@ -14,10 +14,11 @@ type Props = {
   topupCredits: number;
   email: string;
   isAdmin: boolean;
+  dark: boolean;
   children: React.ReactNode;
 };
 
-export function DashboardShell({ subscriptionCredits, topupCredits, email, isAdmin, children }: Props) {
+export function DashboardShell({ subscriptionCredits, topupCredits, email, isAdmin, dark, children }: Props) {
   const { dict } = useI18n();
   const t = dict.shell;
 
@@ -52,7 +53,7 @@ export function DashboardShell({ subscriptionCredits, topupCredits, email, isAdm
           <span className="flex size-8 items-center justify-center rounded-xl bg-brand shadow-soft">
             <Car className="size-4 text-white" />
           </span>
-          <span className="text-base font-semibold tracking-tight">
+          <span className="text-base font-semibold tracking-tight dark:text-white">
             Autókép<span className="text-brand">.</span>
           </span>
         </Link>
@@ -134,9 +135,9 @@ export function DashboardShell({ subscriptionCredits, topupCredits, email, isAdm
   );
 
   return (
-    <div className="min-h-screen bg-secondary/40">
+    <div className={cn("min-h-screen", dark ? "dark bg-background" : "bg-secondary/40")}>
       {/* Mobile top bar */}
-      <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border/60 bg-white/90 px-4 backdrop-blur md:hidden">
+      <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border/60 bg-card/90 px-4 backdrop-blur md:hidden">
         <Link href="/dashboard" className="flex items-center gap-2">
           <span className="flex size-7 items-center justify-center rounded-lg bg-brand">
             <Car className="size-3.5 text-white" />

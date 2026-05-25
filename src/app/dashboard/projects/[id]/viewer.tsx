@@ -314,7 +314,7 @@ export function ProjectViewer(props: Props) {
           )}
         </div>
 
-        <div className="grid gap-6 rounded-3xl border border-border/70 bg-white p-6 shadow-soft sm:grid-cols-2 lg:grid-cols-4">
+        <div className="grid gap-6 rounded-3xl border border-border/70 bg-card p-6 shadow-soft sm:grid-cols-2 lg:grid-cols-4">
           <SliderField
             label={tEdit.rotate}
             value={rotateDeg}
@@ -389,7 +389,7 @@ export function ProjectViewer(props: Props) {
         <h2 className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
           {tView.original}
         </h2>
-        <div className="overflow-hidden rounded-3xl border border-border/70 bg-white shadow-soft">
+        <div className="overflow-hidden rounded-3xl border border-border/70 bg-card shadow-soft">
           {originalUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
@@ -411,7 +411,7 @@ export function ProjectViewer(props: Props) {
         </h2>
         {status === "DONE" && processedUrl ? (
           <div className="flex flex-col gap-4">
-            <div className="overflow-hidden rounded-3xl border border-border/70 bg-white shadow-soft">
+            <div className="overflow-hidden rounded-3xl border border-border/70 bg-card shadow-soft">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={processedUrl}
@@ -482,7 +482,7 @@ export function ProjectViewer(props: Props) {
             </Link>
           </div>
         ) : (
-          <div className="flex h-64 items-center justify-center rounded-3xl border border-border/70 bg-white text-muted-foreground shadow-soft">
+          <div className="flex h-64 items-center justify-center rounded-3xl border border-border/70 bg-card text-muted-foreground shadow-soft">
             {tView.noImage}
           </div>
         )}

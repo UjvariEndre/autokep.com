@@ -71,7 +71,7 @@ export default async function GalleryPage() {
       </div>
 
       {cards.length === 0 ? (
-        <div className="relative overflow-hidden rounded-3xl border border-border/70 bg-white p-12 text-center shadow-soft">
+        <div className="relative overflow-hidden rounded-3xl border border-border/70 bg-card p-12 text-center shadow-soft">
           <div
             aria-hidden
             className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-accent/60 to-transparent"
@@ -100,7 +100,7 @@ export default async function GalleryPage() {
           {cards.map(({ project, status, thumbUrl }) => (
             <article
               key={project.id}
-              className="group relative overflow-hidden rounded-2xl border border-border/70 bg-white shadow-soft transition-all duration-200 hover:-translate-y-1 hover:shadow-soft-lg focus-within:-translate-y-1 focus-within:shadow-soft-lg"
+              className="group relative overflow-hidden rounded-2xl border border-border/70 bg-card shadow-soft transition-all duration-200 hover:-translate-y-1 hover:shadow-soft-lg focus-within:-translate-y-1 focus-within:shadow-soft-lg"
             >
               <Link
                 href={`/dashboard/projects/${project.id}`}
@@ -153,7 +153,7 @@ export default async function GalleryPage() {
                   <button
                     type="button"
                     aria-label={t.deleteAria}
-                    className="absolute bottom-3 right-3 z-10 inline-flex size-9 items-center justify-center rounded-full border border-border/70 bg-white/90 text-muted-foreground shadow-soft backdrop-blur transition-colors hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300"
+                    className="absolute bottom-3 right-3 z-10 inline-flex size-9 items-center justify-center rounded-full border border-border/70 bg-card/90 text-muted-foreground shadow-soft backdrop-blur transition-colors hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-rose-300"
                   >
                     <Trash2 className="size-4" />
                   </button>

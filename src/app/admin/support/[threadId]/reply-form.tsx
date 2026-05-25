@@ -34,7 +34,7 @@ export function ReplyForm({ threadId }: { threadId: string }) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex-shrink-0 border-t border-border/60 bg-white p-4"
+      className="flex-shrink-0 border-t border-border/60 bg-card p-4"
     >
       {error && (
         <p className="mb-2 rounded-lg bg-rose-50 px-3 py-1.5 text-xs text-rose-700">
@@ -55,7 +55,7 @@ export function ReplyForm({ threadId }: { threadId: string }) {
             }
           }}
           disabled={sending}
-          className="max-h-48 min-h-[60px] flex-1 resize-y rounded-xl border border-border bg-white px-3 py-2 text-sm leading-relaxed outline-none transition-colors placeholder:text-muted-foreground/60 focus:border-brand focus:ring-2 focus:ring-brand/20"
+          className="max-h-48 min-h-[60px] flex-1 resize-y rounded-xl border border-border bg-card px-3 py-2 text-sm leading-relaxed outline-none transition-colors placeholder:text-muted-foreground/60 focus:border-brand focus:ring-2 focus:ring-brand/20"
         />
         <button
           type="submit"

@@ -61,7 +61,7 @@ export function DeleteProjectDialog({
         <AlertDialog.Popup
           className={cn(
             "fixed left-1/2 top-1/2 z-50 w-[calc(100vw-2rem)] max-w-md -translate-x-1/2 -translate-y-1/2",
-            "rounded-3xl border border-border/70 bg-white p-6 shadow-soft-lg transition-all duration-200",
+            "rounded-3xl border border-border/70 bg-card p-6 shadow-soft-lg transition-all duration-200",
             "data-[ending-style]:scale-95 data-[ending-style]:opacity-0 data-[starting-style]:scale-95 data-[starting-style]:opacity-0",
           )}
         >

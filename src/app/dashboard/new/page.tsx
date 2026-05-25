@@ -121,7 +121,7 @@ export default function NewProjectPage() {
             "mt-8 flex cursor-pointer flex-col items-center justify-center rounded-3xl border-2 border-dashed py-24 text-center transition-all",
             isDragActive
               ? "border-brand bg-accent/60 shadow-soft-lg"
-              : "border-border bg-white hover:border-brand/40 hover:bg-accent/30",
+              : "border-border bg-card hover:border-brand/40 hover:bg-accent/30",
           )}
         >
           <input {...getInputProps()} />
@@ -149,7 +149,7 @@ export default function NewProjectPage() {
 
       {file && previewUrl && (
         <div className="mt-8 flex flex-col gap-6">
-          <div className="overflow-hidden rounded-3xl border border-border/70 bg-white shadow-soft">
+          <div className="overflow-hidden rounded-3xl border border-border/70 bg-card shadow-soft">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={previewUrl}

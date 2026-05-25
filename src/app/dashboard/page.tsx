@@ -67,7 +67,7 @@ export default function DashboardHomePage() {
           "mt-10 flex cursor-pointer flex-col items-center justify-center rounded-3xl border-2 border-dashed py-20 text-center transition-all",
           isDragActive
             ? "border-brand bg-accent/60 shadow-soft-lg"
-            : "border-border bg-white hover:border-brand/40 hover:bg-accent/30",
+            : "border-border bg-card hover:border-brand/40 hover:bg-accent/30",
         )}
       >
         <input {...getInputProps()} />
@@ -102,7 +102,7 @@ export default function DashboardHomePage() {
           return (
           <div
             key={label}
-            className="rounded-2xl border border-border/70 bg-white p-4 shadow-soft"
+            className="rounded-2xl border border-border/70 bg-card p-4 shadow-soft"
           >
             <div className="mb-2 flex size-9 items-center justify-center rounded-lg bg-accent text-accent-foreground">
               <Icon className="size-4" />

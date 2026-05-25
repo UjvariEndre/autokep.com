@@ -17,6 +17,7 @@ export default async function DashboardLayout({
       topupCredits={user.topupCredits}
       email={user.email}
       isAdmin={isAdminEmail(user.email)}
+      dark={user.theme === "dark"}
     >
       {children}
     </DashboardShell>

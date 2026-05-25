@@ -34,6 +34,9 @@ model User {
   // UI language preference; null = follow IP/cookie default. "hu" | "en"
   locale               String?
 
+  // UI theme preference for the logged-in area; null = light. "light" | "dark"
+  theme                String?
+
   projects      Project[]
   payments      Payment[]
   supportThread SupportThread?

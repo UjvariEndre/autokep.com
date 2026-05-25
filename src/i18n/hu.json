@@ -29,6 +29,10 @@
     "languageHelp": "Válaszd ki az alkalmazás nyelvét. A beállítás a fiókodhoz mentődik, így más eszközön is megmarad.",
     "hungarian": "Magyar",
     "english": "Angol",
+    "themeLabel": "Téma",
+    "themeHelp": "Válaszd ki a felület megjelenését. Csak a bejelentkezett felületre vonatkozik. A beállítás a fiókodhoz mentődik.",
+    "light": "Világos",
+    "dark": "Sötét",
     "saved": "Mentve"
   },
   "landing": {

@@ -33,7 +33,7 @@ export function LanguageSelect() {
           disabled={pending}
           onChange={(e) => handleChange(e.target.value as Locale)}
           aria-label={dict.settings.languageLabel}
-          className="h-11 w-56 appearance-none rounded-xl border border-border bg-white pl-9 pr-9 text-sm font-medium text-foreground shadow-soft outline-none transition-colors focus:border-brand focus:ring-2 focus:ring-brand/20 disabled:opacity-60"
+          className="h-11 w-56 appearance-none rounded-xl border border-border bg-card pl-9 pr-9 text-sm font-medium text-foreground shadow-soft outline-none transition-colors focus:border-brand focus:ring-2 focus:ring-brand/20 disabled:opacity-60"
         >
           <option value="hu">{dict.settings.hungarian}</option>
           <option value="en">{dict.settings.english}</option>

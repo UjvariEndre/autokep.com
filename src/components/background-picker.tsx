@@ -110,7 +110,7 @@ export function BackgroundPicker({
   );
 
   return (
-    <section className="rounded-3xl border border-border/70 bg-white p-5 shadow-soft">
+    <section className="rounded-3xl border border-border/70 bg-card p-5 shadow-soft">
       <div className="mb-3 flex items-center justify-between">
         <h2 className="text-xs font-semibold uppercase tracking-wider text-brand">
           {t.title}
@@ -216,7 +216,7 @@ function BgTile({
         </span>
       )}
       {loading && (
-        <span className="absolute inset-0 flex items-center justify-center bg-white/70">
+        <span className="absolute inset-0 flex items-center justify-center bg-card/70">
           <Loader2 className="size-5 animate-spin text-brand" />
         </span>
       )}
@@ -244,7 +244,7 @@ function UploadTile({
       disabled={disabled}
       aria-label={ariaLabel}
       className={cn(
-        "group relative aspect-[4/3] overflow-hidden rounded-xl border-2 border-dashed bg-white text-muted-foreground transition-all",
+        "group relative aspect-[4/3] overflow-hidden rounded-xl border-2 border-dashed bg-card text-muted-foreground transition-all",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/40",
         "hover:border-brand hover:text-brand",
         disabled && "pointer-events-none opacity-50",

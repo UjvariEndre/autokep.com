@@ -112,7 +112,7 @@ export default async function ProjectPage({
           cutoutUrl={cutoutUrl}
         />
       ) : (
-        <div className="rounded-3xl border border-border/70 bg-white p-8 text-muted-foreground shadow-soft">
+        <div className="rounded-3xl border border-border/70 bg-card p-8 text-muted-foreground shadow-soft">
           {t.noImage}
         </div>
       )}

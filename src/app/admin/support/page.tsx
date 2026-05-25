@@ -74,7 +74,7 @@ export default async function AdminSupportPage() {
                 key={thread.id}
                 href={`/admin/support/${thread.id}`}
                 className={cn(
-                  "group flex items-center justify-between gap-4 rounded-2xl border bg-white px-5 py-4 shadow-soft transition-all hover:-translate-y-0.5 hover:shadow-soft-lg",
+                  "group flex items-center justify-between gap-4 rounded-2xl border bg-card px-5 py-4 shadow-soft transition-all hover:-translate-y-0.5 hover:shadow-soft-lg",
                   hasUnread
                     ? "border-brand/40 ring-1 ring-brand/10"
                     : "border-border/70",

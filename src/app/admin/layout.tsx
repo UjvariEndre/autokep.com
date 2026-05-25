@@ -5,6 +5,7 @@ import { ArrowLeft, ShieldCheck } from "lucide-react";
 import { isAdminEmail } from "@/server/admin";
 import { getOrCreateUser } from "@/server/users";
 import { getI18n } from "@/i18n/locale";
+import { cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
 
@@ -18,8 +19,8 @@ export default async function AdminLayout({
   const { dict } = await getI18n();
 
   return (
-    <div className="min-h-screen bg-secondary/40">
-      <header className="sticky top-0 z-30 border-b border-border/60 bg-white/90 backdrop-blur">
+    <div className={cn("min-h-screen", user.theme === "dark" ? "dark bg-background" : "bg-secondary/40")}>
+      <header className="sticky top-0 z-30 border-b border-border/60 bg-card/90 backdrop-blur">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
           <div className="flex items-center gap-3">
             <Link

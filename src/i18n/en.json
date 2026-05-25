@@ -29,6 +29,10 @@
     "languageHelp": "Choose the app language. The preference is saved to your account, so it stays consistent across devices.",
     "hungarian": "Hungarian",
     "english": "English",
+    "themeLabel": "Theme",
+    "themeHelp": "Choose how the interface looks. Applies only to the signed-in area. The preference is saved to your account.",
+    "light": "Light",
+    "dark": "Dark",
     "saved": "Saved"
   },
   "landing": {

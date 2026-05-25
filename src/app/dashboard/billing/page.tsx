@@ -208,7 +208,7 @@ export default async function BillingPage({
       {payments.length === 0 ? (
         <p className="text-sm text-muted-foreground">{t.noPurchases}</p>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-border/70 bg-white shadow-soft">
+        <div className="overflow-hidden rounded-2xl border border-border/70 bg-card shadow-soft">
           <table className="w-full text-sm">
             <thead className="bg-muted/40 text-left text-xs font-medium uppercase tracking-wider text-muted-foreground">
               <tr>

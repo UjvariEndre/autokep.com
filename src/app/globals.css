@@ -85,36 +85,37 @@
 }
 
 .dark {
-  --background: oklch(0.15 0.01 270);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.2 0.01 270);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.2 0.01 270);
-  --popover-foreground: oklch(0.985 0 0);
+  /* Slate palette (matches Tailwind slate-*) for a calm, readable dark UI. */
+  --background: oklch(0.208 0.042 265.755);       /* slate-900 */
+  --foreground: oklch(0.968 0.007 247.896);       /* slate-100 */
+  --card: oklch(0.279 0.041 260.031);             /* slate-800 — lifts off the bg */
+  --card-foreground: oklch(0.968 0.007 247.896);
+  --popover: oklch(0.279 0.041 260.031);
+  --popover-foreground: oklch(0.968 0.007 247.896);
   --primary: oklch(0.65 0.2 280);
-  --primary-foreground: oklch(0.15 0.01 270);
-  --secondary: oklch(0.27 0.01 270);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.27 0.01 270);
-  --muted-foreground: oklch(0.7 0.015 270);
-  --accent: oklch(0.27 0.05 280);
-  --accent-foreground: oklch(0.985 0 0);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.279 0.041 260.031);        /* slate-800 */
+  --secondary-foreground: oklch(0.968 0.007 247.896);
+  --muted: oklch(0.279 0.041 260.031);            /* slate-800 */
+  --muted-foreground: oklch(0.704 0.04 256.788);  /* slate-400 */
+  --accent: oklch(0.34 0.06 271);                 /* indigo-tinted highlight */
+  --accent-foreground: oklch(0.968 0.007 247.896);
   --destructive: oklch(0.7 0.19 22);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
+  --border: oklch(0.372 0.044 257.287);           /* slate-700 */
+  --input: oklch(0.372 0.044 257.287);
   --ring: oklch(0.6 0.18 271);
   --chart-1: oklch(0.62 0.2 261);
   --chart-2: oklch(0.6 0.22 290);
   --chart-3: oklch(0.65 0.18 250);
   --chart-4: oklch(0.7 0.15 300);
   --chart-5: oklch(0.55 0.2 275);
-  --sidebar: oklch(0.2 0.01 270);
-  --sidebar-foreground: oklch(0.985 0 0);
+  --sidebar: oklch(0.129 0.042 264.695);          /* slate-950 — darker rail */
+  --sidebar-foreground: oklch(0.968 0.007 247.896);
   --sidebar-primary: oklch(0.65 0.2 280);
   --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.27 0.05 280);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
+  --sidebar-accent: oklch(0.34 0.06 271);
+  --sidebar-accent-foreground: oklch(0.968 0.007 247.896);
+  --sidebar-border: oklch(0.372 0.044 257.287);   /* slate-700 */
   --sidebar-ring: oklch(0.6 0.18 271);
 }
 

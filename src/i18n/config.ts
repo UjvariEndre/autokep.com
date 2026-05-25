@@ -13,6 +13,15 @@ export function isLocale(value: string | null | undefined): value is Locale {
   return value === "hu" || value === "en";
 }
 
+// UI theme for the signed-in area. Public pages are always light.
+export const themes = ["light", "dark"] as const;
+export type Theme = (typeof themes)[number];
+export const defaultTheme: Theme = "light";
+
+export function isTheme(value: string | null | undefined): value is Theme {
+  return value === "light" || value === "dark";
+}
+
 /**
  * IP-based default: Hungarian IP -> hu, everything else -> en.
  * `country` is the ISO-3166 alpha-2 code from the host's geo header.
