@@ -13,6 +13,11 @@ const isPublicRoute = createRouteMatcher([
   "/sign-up(.*)",
   "/api/webhook(.*)",
   "/api/health(.*)",
+  // SEO routes must stay crawlable — their .txt/.xml extensions aren't excluded
+  // by the matcher below, so without this they'd fall behind auth.protect().
+  "/robots.txt",
+  "/sitemap.xml",
+  "/opengraph-image(.*)",
 ]);
 
 export default clerkMiddleware(async (auth, request) => {

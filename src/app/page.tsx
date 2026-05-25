@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { auth } from "@clerk/nextjs/server";
@@ -12,10 +13,18 @@ import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { LanguageToggle } from "@/components/language-toggle";
 import { getI18n } from "@/i18n/locale";
+import { SITE_NAME, SITE_URL } from "@/lib/site";
 import type { Dictionary } from "@/i18n/dictionaries";
 
 type LandingDict = Dictionary["landing"];
 type CommonDict = Dictionary["common"];
+
+export async function generateMetadata(): Promise<Metadata> {
+  return {
+    alternates: { canonical: "/" },
+    openGraph: { url: "/" },
+  };
+}
 
 export default async function Home() {
   const { userId } = await auth();
@@ -25,8 +34,28 @@ export default async function Home() {
   const t = dict.landing;
   const common = dict.common;
 
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    name: SITE_NAME,
+    applicationCategory: "MultimediaApplication",
+    operatingSystem: "Web",
+    url: SITE_URL,
+    description: dict.seo.description,
+    offers: {
+      "@type": "Offer",
+      price: "0",
+      priceCurrency: "HUF",
+      description: dict.landing.hero.fineprint,
+    },
+  };
+
   return (
     <div className="min-h-screen bg-white text-foreground">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <SiteNav t={t} common={common} />
       <Hero t={t} common={common} />
       <BeforeAfter t={t} />

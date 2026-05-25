@@ -1,4 +1,21 @@
 {
+  "seo": {
+    "title": "Autókép — AI háttércsere autós fotókhoz",
+    "titleTemplate": "%s · Autókép",
+    "description": "Töltsd fel az autós fotódat, az AI másodpercek alatt kicseréli a hátteret professzionális showroom háttérre. Stúdió-minőségű képek kereskedőknek és magánszemélyeknek. Havi 3 kép ingyen.",
+    "keywords": [
+      "autós fotó háttércsere",
+      "AI háttér eltávolítás",
+      "autó fotó szerkesztő",
+      "showroom háttér",
+      "autókereskedő fotó",
+      "háttér eltávolítás autó",
+      "autóhirdetés fotó"
+    ],
+    "ogImageAlt": "Autókép — AI háttércsere autós fotókhoz",
+    "pricingTitle": "Árak és csomagok",
+    "pricingDescription": "Egyszerű, átlátható árazás. Kezdd ingyen havi 3 képpel, és válts fizetős csomagra a korlátlan használathoz. Bankkártya nem szükséges az induláshoz."
+  },
   "common": {
     "login": "Bejelentkezés",
     "signup": "Próbáld ki",

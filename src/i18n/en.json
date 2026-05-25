@@ -1,4 +1,21 @@
 {
+  "seo": {
+    "title": "Autókép — AI background replacement for car photos",
+    "titleTemplate": "%s · Autókép",
+    "description": "Upload your car photo and our AI swaps the background for a professional showroom backdrop in seconds. Studio-quality images for dealers and individuals. 3 free images every month.",
+    "keywords": [
+      "car photo background replacement",
+      "AI background removal",
+      "car photo editor",
+      "showroom background",
+      "car dealership photos",
+      "remove background car",
+      "vehicle listing photos"
+    ],
+    "ogImageAlt": "Autókép — AI background replacement for car photos",
+    "pricingTitle": "Pricing & plans",
+    "pricingDescription": "Simple, transparent pricing. Start free with 3 images per month and upgrade for unlimited use. No credit card required to get started."
+  },
   "common": {
     "login": "Sign in",
     "signup": "Try it",

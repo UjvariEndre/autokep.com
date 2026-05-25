@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { auth } from "@clerk/nextjs/server";
 import { ArrowRight, Car, Check, Sparkles, X } from "lucide-react";
@@ -11,6 +12,20 @@ import type { Dictionary } from "@/i18n/dictionaries";
 import type { Locale } from "@/i18n/config";
 
 export const dynamic = "force-dynamic";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { dict } = await getI18n();
+  return {
+    title: dict.seo.pricingTitle,
+    description: dict.seo.pricingDescription,
+    alternates: { canonical: "/pricing" },
+    openGraph: {
+      title: dict.seo.pricingTitle,
+      description: dict.seo.pricingDescription,
+      url: "/pricing",
+    },
+  };
+}
 
 export default async function PricingPage({
   searchParams,
