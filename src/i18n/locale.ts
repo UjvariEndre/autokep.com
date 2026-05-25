@@ -1,8 +1,7 @@
 import "server-only";
 import { cache } from "react";
 import { cookies } from "next/headers";
-import { auth } from "@clerk/nextjs/server";
-import { prisma } from "@/lib/prisma";
+import { getCurrentUser } from "@/server/users";
 import { defaultLocale, isLocale, LOCALE_COOKIE, type Locale } from "./config";
 import { getDictionary, type Dictionary } from "./dictionaries";
 
@@ -20,14 +19,10 @@ import { getDictionary, type Dictionary } from "./dictionaries";
  */
 export const getLocale = cache(async (): Promise<Locale> => {
   try {
-    const { userId } = await auth();
-    if (userId) {
-      const user = await prisma.user.findUnique({
-        where: { clerkId: userId },
-        select: { locale: true },
-      });
-      if (isLocale(user?.locale)) return user.locale;
-    }
+    // Reuses the per-request cached user — no extra DB round-trip on top of
+    // what the dashboard layout / page already fetch.
+    const user = await getCurrentUser();
+    if (isLocale(user?.locale)) return user.locale;
   } catch {
     // auth()/prisma may be unavailable in some contexts — fall back to cookie.
   }
