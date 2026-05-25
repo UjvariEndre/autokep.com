@@ -224,7 +224,7 @@ export default async function BillingPage({
                   <td className="px-4 py-3 text-foreground">
                     {formatDate(p.createdAt, locale, t.noDate)}
                   </td>
-                  <td className="px-4 py-3">
+                  <td className="px-4 py-3 text-foreground">
                     {p.type === "subscription" ? t.typeSubscription : t.typeTopup}
                   </td>
                   <td className="px-4 py-3 text-right font-medium text-foreground">

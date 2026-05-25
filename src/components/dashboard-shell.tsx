@@ -135,7 +135,7 @@ export function DashboardShell({ subscriptionCredits, topupCredits, email, isAdm
   );
 
   return (
-    <div className={cn("min-h-screen", dark ? "dark bg-background" : "bg-secondary/40")}>
+    <div className={cn("min-h-screen text-foreground", dark ? "dark bg-background" : "bg-secondary/40")}>
       {/* Mobile top bar */}
       <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border/60 bg-card/90 px-4 backdrop-blur md:hidden">
         <Link href="/dashboard" className="flex items-center gap-2">

@@ -19,7 +19,7 @@ export default async function AdminLayout({
   const { dict } = await getI18n();
 
   return (
-    <div className={cn("min-h-screen", user.theme === "dark" ? "dark bg-background" : "bg-secondary/40")}>
+    <div className={cn("min-h-screen text-foreground", user.theme === "dark" ? "dark bg-background" : "bg-secondary/40")}>
       <header className="sticky top-0 z-30 border-b border-border/60 bg-card/90 backdrop-blur">
         <div className="mx-auto flex h-14 max-w-6xl items-center justify-between px-6">
           <div className="flex items-center gap-3">
